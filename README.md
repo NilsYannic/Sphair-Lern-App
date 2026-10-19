@@ -9,13 +9,15 @@ Lern-App für die Vorbereitung auf **SPHAIR** – mit dem Ziel **Airline-Pilot/-
 | **Heute** | 3 Tagesaufgaben (Lektion, Screening-Training, Quiz), Streak 🔥, Wochenübersicht, Countdown zum Screening, Coach-Tipp |
 | **Lernen** | 9 Themen mit Lektionen und Quiz: Weg ins Airline-Cockpit, Aerodynamik, Flugzeug & Instrumente, Meteorologie, Navigation, Luftrecht & Luftraum, Sprechfunk, Human Factors, Flugbetrieb. Karteikasten-System: falsche Fragen kommen schneller wieder. |
 | **Training** | Trainer für alle 4 Screening-Blöcke: Kopfrechnen (sehen & hören), Englisch, Würfel kippen, Figuren drehen, Funksprüche merken, Zahlenreihen, Vergleichen, Symbole zählen, Technisches Verständnis, Instrumente lesen, Blitz-Wahrnehmung, Rechenaufgaben, Multitasking. Schwierigkeit passt sich an. |
+| **Flugkurs: Need to know** | Der offizielle Lernstoff aus «Grundlagen & Verfahren 2026» (GuV), den SPHAIR am 1. Kurstag testet – alle «exakt»-Kästen markiert. Trainer «Verfahren auswendig» (MOVE/STOP, PAT/APT, Take-off …) und «Checkliste» mit den offiziellen Checklisten aller 9 SPHAIR-Flugschulen (Ansicht mit Werte-Abdecken). |
 | **Screening-Simulation** | Alle Tests am Stück, ohne Feedback – wie am echten Screening |
 | **Coach** | KI-Coach (Claude) mit deinem Lernstand. Ohne API-Schlüssel gibt es einen einfachen Offline-Coach. |
 
 ## Quellen
 
-Die Fakten zu SPHAIR stammen von [sphair.ch](https://sphair.ch/de/airlinepilot), dem offiziellen [Lernprogramm](https://lernprogramm.sphair.ch/), [berufsberatung.ch](https://www.berufsberatung.ch/de/aus-weiterbildungen/aero-club-der-schweiz-sphair/nachwuchspiloten-innen-eignungsabklaerung) und der [European Flight Academy](https://www.european-flight-academy.com/en/advantages-sphair-candidates). Alle Links stehen in der App unter *Profil → Offizielle Quellen*. Die offiziellen Übungstests gibt es nach der Registrierung auf sphair.ch (MySPHAIR) – nutze sie zusätzlich!
+Die Inhalte basieren auf den offiziellen SPHAIR-Dokumenten (Grundlagen & Verfahren 2026, Need to have / need to know, Are you ready for departure?, Checklists & Procedures) sowie [sphair.ch](https://sphair.ch/de/airlinepilot), dem offiziellen [Lernprogramm](https://lernprogramm.sphair.ch/), [berufsberatung.ch](https://www.berufsberatung.ch/de/aus-weiterbildungen/aero-club-der-schweiz-sphair/nachwuchspiloten-innen-eignungsabklaerung) und der [European Flight Academy](https://www.european-flight-academy.com/en/advantages-sphair-candidates). Alle Links stehen in der App unter *Profil → Offizielle Quellen*. Die offiziellen Übungstests gibt es nach der Registrierung auf sphair.ch (MySPHAIR) – nutze sie zusätzlich!
 
+> GuV und Checklisten: © Schweizerische Eidgenossenschaft, vertreten durch die Luftwaffe – frei für Aus- und Weiterbildungszwecke. Im Kurs gilt immer die Checkliste deiner Flugschule.
 > Die Trainer sind eigene Übungen im Stil der Screening-Tests, keine Originaltests. Regeln, Termine und Kosten immer auf sphair.ch prüfen.
 
 ## Online stellen (GitHub Pages, gratis)

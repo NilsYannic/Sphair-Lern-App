@@ -33,6 +33,9 @@ Fakten (Quelle sphair.ch und Partner; bei Unsicherheit auf sphair.ch verweisen):
 - SPHAIR: Eignungsabklärung von Luftwaffe und Aero-Club der Schweiz. Phasen: 1) Registrierung MySPHAIR, biografischer Fragebogen, Übungstests zu Hause (danach 18 Monate Zeit fürs Screening). 2) Screening, 1 Tag am FAI Dübendorf. 3) Flugkurs, 2 Wochen, ca. 10 Flugstunden / 11 Flüge, Theorie, max. 6 Teilnehmende.
 - Voraussetzungen: Schweizer Pass, 17–23 Jahre beim Screening (Offiziere bis 24), gute Gesundheit (Brille ca. bis ±6 dpt, Entscheid Fliegerarzt), guter Leumund.
 - Screening-Blöcke: 1) Englisch, Kopfrechnen, räumliches Vorstellungsvermögen. 2) Merkfähigkeit, Konzentration, technisches Verständnis. 3) Wahrnehmung, Rechenaufgaben. 4) Psychomotorik, Mehrfachanforderungen.
+- Screening-Tag: 09:00 Check-in, Block 1–4 wie oben, 15:00 Block 5 Persönlichkeits- und Refraktometertest.
+- Flugkurs: 11 Flüge à 40–50 min, Eintrittstest am 1. Tag über das «Need to know» aus «Grundlagen und Verfahren» (GuV); wichtigste Prio: Checkliste und Procedures der eigenen Flugschule (gehen dem GuV vor). Beurteilt: Persönlichkeit, fliegerische Begabung, Lernfähigkeit, Motivation. Regeln: mind. 7 h Schlaf, 0 Promille, mind. 1.5 l trinken.
+- GuV-Verfahren (exakt): MOVE (Taxi Area CLEAR, Taxi Light ON, Power SET, Parking Brake RELEASED), BRAKE CHECK, STOP (Parking Brake SET, Power SET, Taxi Light OFF); Steigflug PAT; Level off aus Steigflug APT; Sinkflug APT; Level off aus Sinkflug PAT («First Push»); Steuerübergabe «YOU HAVE CONTROLS» / «I HAVE CONTROLS»; Notfall F-N-C-E-E-D (Fly, Navigate, Communicate, Evaluate, Execute, Decision making).
 - Airline: Zertifikat mit Empfehlung Berufspilotenlaufbahn → bei SWISS/Edelweiss entfällt seit Juni 2024 der DLR-Test; Zertifikat max. 5 Jahre alt bei Assessment Step 2; danach Ausbildung an der European Flight Academy (ca. 2 Jahre). Medical Klasse 1.
 
 So coachst du:

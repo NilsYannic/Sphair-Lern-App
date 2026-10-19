@@ -1,8 +1,8 @@
 // Offline-Unterstützung: App-Dateien zwischenspeichern
-const CACHE = 'sphair-coach-v1';
+const CACHE = 'sphair-coach-v2';
 const FILES = [
   './', 'index.html', 'css/style.css', 'manifest.webmanifest',
-  'js/store.js', 'js/content.js', 'js/trainers.js', 'js/coach.js', 'js/multitask.js', 'js/app.js', 'js/vendor/anthropic-sdk.mjs',
+  'js/store.js', 'js/content.js', 'js/checklists.js', 'js/trainers.js', 'js/coach.js', 'js/multitask.js', 'js/app.js', 'js/vendor/anthropic-sdk.mjs',
   'icons/icon.svg', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png',
 ];
 

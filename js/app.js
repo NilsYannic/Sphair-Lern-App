@@ -168,6 +168,7 @@ ${daysLeft != null ? `<section class="card countdown"><div><b>${daysLeft > 0 ? d
     activeTask = null;
     view.innerHTML = `
 <section class="hero"><h1>Lernen</h1><p class="muted">Die Theorie für Flugkurs und Airline-Weg. Lies die Lektionen, dann festigt das Quiz dein Wissen.</p></section>
+<a class="card review" href="#checkliste"><span class="ticon">📋</span><span class="tt"><b>Checkliste deiner Flugschule</b><small>${esc(T.checklistOf().key)} – offizielle SPHAIR-Checkliste</small></span><span class="chev">›</span></a>
 <a class="card review" href="#quiz/all"><span class="ticon">🔁</span><span class="tt"><b>Fällige Karten wiederholen</b><small>${dueAll().length} Fragen sind heute dran</small></span><span class="chev">›</span></a>
 <div class="grid">
   ${C.TOPICS.map((t) => { const m = S.mastery(t.id); return `<a class="card topic" href="#thema/${t.id}" style="--c:${t.color}">
@@ -382,6 +383,25 @@ ${!untimed && item.time ? '<div class="bar timer"><i id="tBar"></i></div>' : ''}
     next();
   }
 
+  // ---------- Checkliste lesen / abdecken ----------
+  function renderCheckliste() {
+    const cl = T.checklistOf();
+    const keys = Object.keys(window.CHECKLISTS || {});
+    view.innerHTML = `
+<a class="back" href="#lernen">‹ Lernen</a>
+<section class="hero"><h1>Checkliste</h1><p class="muted">Offizielle SPHAIR-Checkliste der Flugschule. Tipp: «Werte abdecken» einschalten und laut aufsagen – wie im Cockpit.</p></section>
+<section class="card form">
+  <label>Flugschule & Flugzeug<select id="clSel">${keys.map((k) => `<option value="${esc(k)}" ${k === cl.key ? 'selected' : ''}>${esc(k)}</option>`).join('')}</select></label>
+  <label class="check"><input type="checkbox" id="clHide"> Werte abdecken (antippen zum Aufdecken)</label>
+</section>
+<div id="clList">${cl.checks.map((c) => `<section class="card cl"><h2>${esc(c.name)}</h2><ol>${c.items.map(([k, v], i) => `<li><span><small class="muted">${i + 1}.</small> ${esc(k)}</span><b class="clv">${esc(v)}</b></li>`).join('')}</ol><p class="muted small">${esc(c.name)} COMPLETED</p></section>`).join('')}</div>
+<p class="note">Quelle: sphair.ch «Checklists & Procedures» (2026). Im Kurs gilt immer die Papier-Checkliste deiner Flugschule.</p>
+<a class="btn wide" href="#training/checkliste">Checkliste trainieren</a>`;
+    $('#clSel').addEventListener('change', (e) => { S.settings.school = e.target.value; S.saveSettings(); renderCheckliste(); });
+    $('#clHide').addEventListener('change', (e) => $('#clList').classList.toggle('hide', e.target.checked));
+    $('#clList').addEventListener('click', (e) => { const v = e.target.closest('.clv'); if (v) v.classList.toggle('show'); });
+  }
+
   // ---------- Ansicht: Training ----------
   function levelFor(id) {
     const a = S.trainerAvg(id);
@@ -389,8 +409,8 @@ ${!untimed && item.time ? '<div class="bar timer"><i id="tBar"></i></div>' : ''}
   }
 
   function renderTraining() {
-    const blocks = [1, 2, 3, 4];
-    const names = { 1: 'Block 1 · Englisch, Kopfrechnen, Räumlich', 2: 'Block 2 · Merken, Konzentration, Technik', 3: 'Block 3 · Wahrnehmung, Rechnen', 4: 'Block 4 · Psychomotorik, Multitasking' };
+    const blocks = [1, 2, 3, 4, 5];
+    const names = { 1: 'Block 1 · Englisch, Kopfrechnen, Räumlich', 2: 'Block 2 · Merken, Konzentration, Technik', 3: 'Block 3 · Wahrnehmung, Rechnen', 4: 'Block 4 · Psychomotorik, Multitasking', 5: 'Flugkurs · Verfahren & Checkliste' };
     const lastSim = S.data.sims[S.data.sims.length - 1];
     view.innerHTML = `
 <section class="hero"><h1>Training</h1><p class="muted">Trainiere alle Tests des Screenings. Der Schwierigkeitsgrad passt sich automatisch an.</p></section>
@@ -586,6 +606,7 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
   <h2>Über dich</h2>
   <label>Vorname<input id="pName" value="${esc(st.name)}" placeholder="z.B. Nils"></label>
   <label>Screening-Datum (falls bekannt)<input id="pDate" type="date" value="${esc(st.screeningDate)}"></label>
+  <label>SPHAIR-Flugschule (für die Checkliste)<select id="pSchool"><option value="">Noch nicht bekannt (Beispiel: Bern-Belp)</option>${Object.keys(window.CHECKLISTS || {}).map((k) => `<option value="${esc(k)}">${esc(k)}</option>`).join('')}</select></label>
   <label>Darstellung<select id="pTheme"><option value="auto">Automatisch</option><option value="light">Hell</option><option value="dark">Dunkel</option></select></label>
 </section>
 
@@ -614,6 +635,8 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
   <button class="link-btn danger" id="pReset">Fortschritt zurücksetzen</button>
 </section>`;
     $('#pTheme').value = st.theme;
+    $('#pSchool').value = st.school || '';
+    $('#pSchool').addEventListener('change', (e) => { st.school = e.target.value; S.saveSettings(); toast('Gespeichert'); });
     $('#pModel').value = st.model;
     $('#pName').addEventListener('change', (e) => { st.name = e.target.value.trim(); S.saveSettings(); toast('Gespeichert'); });
     $('#pDate').addEventListener('change', (e) => { st.screeningDate = e.target.value; S.saveSettings(); toast('Gespeichert'); });
@@ -673,7 +696,7 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
     if (cleanup) { try { cleanup(); } catch { /* ignorieren */ } cleanup = null; }
     view.onkeydown = null;
     const [page, a, b] = (location.hash.slice(1) || 'heute').split('/');
-    const tab = { heute: 'heute', lernen: 'lernen', thema: 'lernen', lektion: 'lernen', quiz: 'lernen', training: 'training', simulation: 'training', coach: 'coach', profil: 'profil' }[page] || 'heute';
+    const tab = { heute: 'heute', lernen: 'lernen', thema: 'lernen', checkliste: 'lernen', lektion: 'lernen', quiz: 'lernen', training: 'training', simulation: 'training', coach: 'coach', profil: 'profil' }[page] || 'heute';
     document.querySelectorAll('.tabs a').forEach((x) => x.classList.toggle('active', x.dataset.tab === tab));
     document.body.classList.toggle('in-chat', page === 'coach');
     if (!S.settings.onboarded) return renderWelcome();
@@ -684,6 +707,7 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
       case 'quiz': renderQuiz(a, b); break;
       case 'training': a ? renderTrainer(a) : renderTraining(); break;
       case 'simulation': renderSimulation(); break;
+      case 'checkliste': renderCheckliste(); break;
       case 'coach': renderCoach(); break;
       case 'profil': renderProfil(); break;
       default: renderHeute();

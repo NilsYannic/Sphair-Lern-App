@@ -5,7 +5,14 @@
     { title: 'SPHAIR – Airlinepilot/-in werden', url: 'https://sphair.ch/de/airlinepilot' },
     { title: 'SPHAIR – Screening Pilot/-in', url: 'https://sphair.ch/de/pilot/screening' },
     { title: 'SPHAIR – Flugkurs', url: 'https://sphair.ch/de/pilot/flugkurs' },
-    { title: 'SPHAIR – Lernprogramm (offiziell)', url: 'https://lernprogramm.sphair.ch/de/navigation/grundlagen-der-navigation' },
+    { title: 'SPHAIR – Vorbereitung Pilot/-in (alle Unterlagen)', url: 'https://sphair.ch/de/pilot/vorbereitung' },
+    { title: 'SPHAIR – Grundlagen & Verfahren 2026 (PDF)', url: 'https://storagesphairprod.blob.core.windows.net/strapimedia-abn/assets/2026_GUV_d_401edd35e6.pdf' },
+    { title: 'SPHAIR – Need to have / need to know (PDF)', url: 'https://storagesphairprod.blob.core.windows.net/strapimedia-abn/assets/need_to_have_need_to_know_d_e54dcab1da.pdf' },
+    { title: 'SPHAIR – Are you ready for departure? (PDF)', url: 'https://storagesphairprod.blob.core.windows.net/strapimedia-abn/assets/2026_Are_you_ready_de_eb3e7dcd2b.pdf' },
+    { title: 'SPHAIR – Checklists & Procedures aller Flugschulen (ZIP)', url: 'https://storagesphairprod.blob.core.windows.net/strapimedia-abn/assets/Checklists_and_Procedures_5e2d3e430a.zip' },
+    { title: 'SPHAIR – Brief Augenarzt / Optiker (PDF)', url: 'https://storagesphairprod.blob.core.windows.net/strapimedia/assets/Brief_Augenarzt_Optiker_DE_f1e71b384f.pdf' },
+    { title: 'SPHAIR – Karriereweg Airline (PDF)', url: 'https://storagesphairprod.blob.core.windows.net/strapimedia/assets/Karrieregrafik_Airline_c30af13295.pdf' },
+    { title: 'SPHAIR – Lernprogramm (offiziell)', url: 'https://lernprogramm.sphair.ch/de/' },
     { title: 'SPHAIR – Für BIZ, Lehrpersonen & Eltern', url: 'https://sphair.ch/de/beeinflusser' },
     { title: 'berufsberatung.ch – Nachwuchspiloten: Eignungsabklärung', url: 'https://www.berufsberatung.ch/de/aus-weiterbildungen/aero-club-der-schweiz-sphair/nachwuchspiloten-innen-eignungsabklaerung' },
     { title: 'European Flight Academy – Vorteile für SPHAIR-Kandidaten', url: 'https://www.european-flight-academy.com/en/advantages-sphair-candidates' },
@@ -40,26 +47,32 @@
 <ol>
 <li><b>Vorbereitung zu Hause (MySPHAIR):</b> Auf sphair.ch registrieren, biografischen Fragebogen ausfüllen und mit den offiziellen Übungstests trainieren. Nach dem Fragebogen hast du <b>18 Monate</b> Zeit fürs Screening.</li>
 <li><b>Screening:</b> 1 Tag am <b>Fliegerärztlichen Institut (FAI) in Dübendorf</b>. Getestet werden geistiges und psychomotorisches Potenzial (4 Testblöcke).</li>
-<li><b>Flugkurs:</b> 2 Wochen bei einer SPHAIR-Partnerflugschule (meist in den Schulferien), rund <b>10 Flugstunden / 11 Flüge</b> plus Theorie, kleine Gruppen (max. 6) mit Fluglehrern.</li>
+<li><b>Flugkurs:</b> 2 Wochen bei einer SPHAIR-Partnerflugschule (in den Schulferien im Frühling, Sommer und Herbst), <b>11 Flüge à ca. 45 Minuten</b> (rund 10 Flugstunden) plus Theorie. Ab Tag 1 steuerst du selbst.</li>
 </ol>
 <p>Am Schluss: <b>SPHAIR-Zertifikat</b> mit Empfehlung (z.&nbsp;B. für die Berufspilotenlaufbahn).</p>` },
-        { t: 'Die 4 Screening-Blöcke', b: `
-<p>Laut sphair.ch ist das Screening in vier Blöcke aufgeteilt:</p>
-<ol>
-<li><b>Englisch, Kopfrechnen, räumliches Vorstellungsvermögen</b></li>
-<li><b>Merkfähigkeit, Konzentration, technisches Verständnis</b></li>
-<li><b>Wahrnehmung und Rechenaufgaben</b></li>
-<li><b>Psychomotorik und Mehrfachanforderungen</b> (Multitasking)</li>
-</ol>
+        { t: 'Der Screening-Tag', b: `
+<p>So sieht der Tag laut sphair.ch aus:</p>
+<ul>
+<li><b>09:00</b> Check-in: biografischer Fragebogen und Brillen-/Linsenpass</li>
+<li><b>10:00</b> Block 1: <b>Englisch, Kopfrechnen, räumliches Vorstellungsvermögen</b></li>
+<li><b>11:00</b> Block 2: <b>Merkfähigkeit, Konzentrationsvermögen, technisches Verständnis</b></li>
+<li><b>12:00</b> Mittagspause</li>
+<li><b>13:00</b> Block 3: <b>Wahrnehmung und Rechenaufgaben</b></li>
+<li><b>14:00</b> Block 4: <b>Psychomotorik und Mehrfachanordnungen</b> (Multitasking)</li>
+<li><b>15:00</b> Block 5: <b>Persönlichkeits- und Refraktometertest</b></li>
+</ul>
+<p>Offizieller Tipp: Mit den Übungsaufgaben auf sphair.ch üben, <b>bis du keine wesentlichen Fortschritte mehr machst</b>.</p>
+<p><b>Brille?</b> Lade auf sphair.ch den «Brief Augenarzt / Optiker» herunter, lass ihn ausfüllen und gib die Werte in den Sehstärken-Rechner ein. Die Ergebnisse brauchst du für die Anmeldung zum Screening.</p>
 <p>Für jeden Block gibt es in dieser App einen <b>Trainer</b> unter «Training». Die <b>Screening-Simulation</b> spielt alles am Stück durch.</p>
 <p class="note">Erfahrungsberichte: Kopfrechnen kommt visuell <i>und</i> akustisch, ohne Notizen und mit Zeitlimit. Quadrat- und Kubikzahlen helfen viel.</p>` },
         { t: 'Der Airline-Weg', b: `
 <p>Mit einem SPHAIR-Zertifikat mit <b>Empfehlung für die Berufspilotenlaufbahn</b> hast du bei <b>SWISS und Edelweiss</b> einen vereinfachten Zugang zum Assessment:</p>
 <ul>
-<li>Seit Juni 2024 kannst du den <b>DLR-Test auslassen</b>.</li>
+<li>Du steigst direkt bei <b>Step 2 des «Lufthansa Group Assessments»</b> ein – der obligatorische <b>DLR-Test (Step 1) entfällt</b> (seit Juni 2024).</li>
 <li>Das Zertifikat darf beim Assessment (Step 2) <b>höchstens 5 Jahre alt</b> sein.</li>
 <li>Gilt für SWISS und Edelweiss. Für andere Lufthansa-Group-Airlines brauchst du weiterhin den DLR-Test.</li>
 </ul>
+<p>Weitere Voraussetzungen laut sphair.ch: <b>sehr gute Englischkenntnisse</b> bei Ausbildungsbeginn, bestandene medizinische Checks (Brille erlaubt) und die Anforderungen deines Arbeitgebers.</p>
 <p>Nach bestandenem Assessment: Ausbildung an der <b>European Flight Academy</b> (ca. 2 Jahre).</p>
 <p><b>Finanzierung</b> (laut Quellen, bitte aktuell prüfen): Eigenleistung CHF 10'000 vor Beginn und CHF 14'000 während der Ausbildung, Rückzahlung später aus dem Pilotensalär möglich.</p>` },
         { t: 'Was danach kommt (ATPL-Fächer)', b: `
@@ -86,13 +99,220 @@
       questions: [
         { q: 'Wo findet das SPHAIR-Screening statt?', a: ['Fliegerärztliches Institut Dübendorf', 'Flughafen Zürich', 'Militärflugplatz Payerne', 'Bern-Belp'], c: 0, e: 'Das eintägige Screening findet am Fliegerärztlichen Institut (FAI) in Dübendorf statt.' },
         { q: 'In welchem Alter kannst du das Screening machen?', a: ['17 bis 23 Jahre', '15 bis 20 Jahre', '18 bis 30 Jahre', 'Ab 16 ohne Obergrenze'], c: 0, e: '17–23 Jahre (brevetierte Offiziere bis 24).' },
-        { q: 'Wie lange dauert der SPHAIR-Flugkurs?', a: ['2 Wochen', '1 Tag', '3 Monate', '1 Wochenende'], c: 0, e: 'Zwei Wochen mit rund 10 Flugstunden (11 Flüge) und Theorie.' },
+        { q: 'Wie lange dauert der SPHAIR-Flugkurs?', a: ['2 Wochen', '1 Tag', '3 Monate', '1 Wochenende'], c: 0, e: 'Zwei Wochen mit 11 Flügen à ca. 45 Minuten und Theorie.' },
         { q: 'Welchen Vorteil bringt das Zertifikat (mit Empfehlung Berufspilot) bei SWISS/Edelweiss?', a: ['Der DLR-Test entfällt', 'Die Ausbildung ist gratis', 'Man braucht kein Medical', 'Man wird direkt Captain'], c: 0, e: 'Seit Juni 2024 können SPHAIR-Absolvent/-innen mit Empfehlung den DLR-Test auslassen.' },
         { q: 'Wie alt darf das SPHAIR-Zertifikat beim Airline-Assessment (Step 2) höchstens sein?', a: ['5 Jahre', '1 Jahr', '10 Jahre', 'Unbegrenzt'], c: 0, e: 'Maximal 5 Jahre am Tag von Step 2.' },
+        { q: 'Was wird im Screening-Block 5 getestet?', a: ['Persönlichkeit und Refraktometer (Augen)', 'Englisch', 'Psychomotorik', 'Simulatorflug'], c: 0, e: 'Block 5 um 15:00: Persönlichkeits- und Refraktometertest.' },
         { q: 'Welcher Testblock gehört zum Screening-Block 1?', a: ['Englisch, Kopfrechnen, räumliches Vorstellen', 'Psychomotorik', 'Flug im Simulator', 'Medizinische Untersuchung'], c: 0, e: 'Block 1: Englisch, Kopfrechnen und räumliches Vorstellungsvermögen.' },
         { q: 'Wie viel Zeit hast du nach dem biografischen Fragebogen für das Screening?', a: ['18 Monate', '1 Monat', '5 Jahre', '6 Wochen'], c: 0, e: '18 Monate nach dem Fragebogen.' },
         { q: 'Welche Medical-Klasse brauchen Berufspiloten?', a: ['Klasse 1', 'Klasse 2', 'LAPL', 'Keine'], c: 0, e: 'Berufspiloten (CPL/ATPL/MPL) brauchen ein Medical der Klasse 1.' },
         { q: 'Wo findet die Airline-Ausbildung von SWISS/Edelweiss statt?', a: ['European Flight Academy', 'Fliegerärztliches Institut', 'Pilotenschule der Luftwaffe', 'ETH Zürich'], c: 0, e: 'Nach bestandenem Assessment bildet die European Flight Academy aus (ca. 2 Jahre).' },
+      ],
+    },
+    {
+      id: 'flugkurs', name: 'Flugkurs: Need to know', icon: '🛩️', color: '#0f766e',
+      desc: 'Offizieller Lernstoff aus «Grundlagen & Verfahren» – wird am 1. Kurstag getestet',
+      lessons: [
+        { t: 'So läuft der Flugkurs ab', b: `
+<p>Aus der offiziellen Broschüre <b>«Are you ready for departure?»</b>:</p>
+<ul>
+<li><b>11 Flüge</b> à 40–50 Minuten, dazu Theorie. Jeder Flug wird vorbesprochen (Briefing) und nachbesprochen (Debriefing).</li>
+<li>Flüge 1–5 mit einem Fluglehrer, Flüge 6–10 mit dem anderen. Ein <b>P&S-Fluglehrer</b> der Luftwaffe fliegt mindestens einmal mit dir.</li>
+<li>Am <b>1. Tag</b> wird dein «Need to know» in einem <b>Eintrittstest</b> geprüft.</li>
+<li>Nach der ersten Woche: mündliche <b>Standortbestimmung</b>. Am Ende: <b>Schlussbeurteilung</b>.</li>
+<li>Beurteilt werden <b>Persönlichkeit, fliegerische Begabung, Lernfähigkeit und Motivation</b>. Es zählt das Gesamtbild.</li>
+</ul>
+<p><b>Flugsicherheit:</b> mindestens <b>7 Stunden Schlaf</b>, <b>0 Promille</b>, genug essen und mindestens <b>1.5 Liter</b> trinken (am besten Wasser ohne Kohlensäure).</p>
+<p class="note">Quelle: SPHAIR «Are you ready for departure?» (2025) und sphair.ch/de/pilot/flugkurs</p>` },
+        { t: 'Was du lernen musst (Need to know)', b: `
+<p>SPHAIR verlangt, dass du vor dem Kurs bestimmte Kapitel aus <b>«Grundlagen und Verfahren» (GuV)</b> lernst. Es gibt zwei Stufen:</p>
+<ul><li><b>Sinngemäss:</b> verstehen und in eigenen Worten wiedergeben</li><li><b>Exakt (Prio 1):</b> <b>wörtlich</b> auswendig können</li></ul>
+<p><b>Am wichtigsten</b> sind die <b>Checklist und Procedures deiner Flugschule</b> (Prio 1). Wenn sie dem GuV widersprechen, gilt immer die Checkliste deines Schulflugzeugs.</p>
+<p>Ausserdem: die Umgebung des Flugplatzes (Ortschaften, Seen, markante Erhebungen). Tipp: Google Earth.</p>
+<p>In dieser App sind alle «exakt»-Kästen <span class="exact-tag">EXAKT</span> markiert. Trainiere sie im Trainer <b>«Verfahren auswendig»</b>, die Checklisten im Trainer <b>«Checkliste»</b>.</p>
+<p class="note">Quelle: SPHAIR «Need to have – need to know» (12.11.2025)</p>` },
+        { t: 'Flugüberwachungsinstrumente (1.2.3)', b: `
+<div class="exact"><span class="exact-tag">EXAKT · 1.2.3.1</span>
+<p><b>Anzeige für die Lage / ATTITUDE</b></p>
+<p>AI – ATTITUDE INDICATOR – Lage-Anzeige-Instrument</p>
+<p><b>Anzeigen für die Flugleistung / PERFORMANCE</b></p>
+<p>ASI – AIR SPEED INDICATOR – Fluggeschwindigkeits-Anzeige<br>ALT – ALTIMETER – Flughöhe-Anzeige<br>T / S – TURN AND SLIP INDICATOR – Wendezeiger<br>T / C – TURN COORDINATOR – Kurvenkoordinator<br>DG – DIRECTIONAL GYRO – Kurskreisel<br>VSI – VERTICAL SPEED INDICATOR – Vertikale Geschwindigkeits-Anzeige<br>MC – MAGNETIC COMPASS – Magnet-Kompass<br>STOP WATCH – Stoppuhr</p></div>
+<p>Die Instrumente sind in <b>T-Form</b> angeordnet – wichtig für das systematische Ablesen (SCANNING). Farben: <b>grün</b> = normaler Betriebsbereich, <b>gelb</b> = Vorsichtsbereich, <b>rote Marke</b> = Grenzwert.</p>
+<div class="exact"><span class="exact-tag">EXAKT · 1.2.3.4 Kasten</span>
+<p>Farbsegmente auf dem ASI:</p>
+<p>V<sub>SO</sub> – Stall Speed in Landing Configuration (Beginn weisser Bogen)<br>V<sub>S1</sub> – Stall Speed Clean (Beginn grüner Bogen)<br>V<sub>FE</sub> – Max. Flaps Extended Speed (Ende weisser Bogen)<br>V<sub>NO</sub> – Normal Operation Speed (Ende grüner Bogen)<br>V<sub>NE</sub> – Never Exceed Speed (rote Linie)<br>GREEN ARC – Normal Range · YELLOW ARC – Caution Range</p></div>
+<p>Nicht auf dem ASI: aktuelle Stall Speed V<sub>S</sub> (ändert mit Masse, Konfiguration, Lastvielfachem), Manövergeschwindigkeit V<sub>A</sub> (masseabhängig), V<sub>LE</sub> (Fahrwerk).</p>
+<p class="note">© Schweizerische Eidgenossenschaft, vertreten durch die Luftwaffe – SPHAIR Grundlagen & Verfahren 2026, Kap. 1.2</p>` },
+        { t: 'Checks und Procedures (2.9)', b: `
+<ul>
+<li><b>PROCEDURE</b> = Tätigkeit, die zu einem bestimmten Zeitpunkt zwingend ausgeführt werden muss (z.&nbsp;B. Klappen aus-/einfahren). Steht nicht auf der Checkliste, muss auswendig gelernt werden.</li>
+<li><b>CHECK</b> = Kontrolle, ob die Procedures vollständig und korrekt erledigt sind. Alle Checks stehen auf der CHECKLIST.</li>
+<li>Jeder Check hat einen Namen. Beginn und Ende werden <b>laut angesagt</b>: «CLIMB CHECK … CLIMB CHECK COMPLETED».</li>
+<li>Alle Punkte und Werte werden <b>laut</b> ausgesprochen. Es wird <b>nie «AS REQUIRED»</b> gemeldet – du sagst, was aktuell verlangt ist.</li>
+<li>Zwischen den Punkten immer wieder kurz nach aussen schauen. <b>Das Steuern des Flugzeuges hat immer Priorität.</b></li>
+<li>Ein senkrechter Strich am linken Rand bedeutet: <b>auswendig</b> durchführen.</li>
+<li>Ruhig, überlegt, bestimmt. Eine Hand bleibt am Steuer. Keine Hektik, nicht herumzeigen, nicht an Instrumentengläser klopfen.</li>
+</ul>
+<p>Die Reihenfolge der Punkte ist zwingend. Nur die immer gleiche Ausführung garantiert, dass du dich im Notfall auch unter Zeitdruck richtig verhältst.</p>
+<p class="note">Zusammenfassung von GuV 2026, Kap. 2.9.1–2.9.8 (sinngemäss)</p>` },
+        { t: 'Horizont, Fluglage, Steuerübergabe (3)', b: `
+<p><b>Scheinhorizont:</b> verläuft parallel zum realen Horizont und ist die Referenz für die Lage. In den Bergen muss man ihn sich vorstellen (Skyline, Wolkenschicht). Im Zweifel: Blick auf den AI.</p>
+<p><b>Flug ohne Horizont ist nicht möglich:</b> In Wolken ohne künstlichen Horizont ist man spätestens nach <b>170 Sekunden</b> in einer unkontrollierbaren Lage (räumliche Desorientierung, VERTIGO).</p>
+<div class="exact"><span class="exact-tag">EXAKT · 3.3.1 Attitude</span>
+<p>Flugbahn / FLIGHT PATH – Bewegungsrichtung des Flugzeuges<br>Fluglage / ATTITUDE – Winkel der Flugzeuglängsachse gegenüber dem Horizont</p></div>
+<div class="exact"><span class="exact-tag">EXAKT · 3.5 Kasten</span>
+<p>Übergabe der Steuer:<br>PF: <b>«YOU HAVE CONTROLS»</b><br>PM: <b>«I HAVE CONTROLS»</b></p>
+<p>Der PF hält die Steuer so lange, bis der andere übernommen und quittiert hat.</p></div>
+<p>Der <b>PIC</b> (Pilot in Command) entscheidet in letzter Instanz. <b>Steuerübergabe ist keine Kommandoübergabe!</b> PF = Pilot Flying, PM = Pilot Monitoring.</p>
+<div class="exact"><span class="exact-tag">EXAKT · 3.6.1 Traffic Report</span>
+<p>Richtung nach dem Uhrzifferblatt, dazu HIGH / SAME ALTITUDE / LOW:<br><b>«TRAFFIC, THREE O'CLOCK, HIGH»</b> – Bestätigung: <b>«IN SIGHT»</b></p></div>
+<p>Grundsatz: Wer ein Luftfahrzeug zuerst sieht, merkt es sich und meldet es.</p>
+<p><b>Scanning:</b> Immer von der Referenz für die Fluglage (Horizont) ausgehen, Luftraum und Leistungsanzeigen prüfen, dann zurück zur Referenz. <b>Die Kontrolle der Fluglage hat immer Priorität.</b></p>
+<p class="note">© Schweizerische Eidgenossenschaft, vertreten durch die Luftwaffe – GuV 2026, Kap. 3</p>` },
+        { t: 'Fit für den Flugdienst (3.11)', b: `
+<ul>
+<li>Nicht fliegen bei Übermüdung, Stress, Gereiztheit oder starken Emotionen.</li>
+<li>Gesund, ausgeschlafen; verordnete Brille tragen und <b>Ersatzbrille</b> mitführen.</li>
+<li>Nicht rauchen vor und während des Flugdienstes.</li>
+<li>Nach Tiefseetauchen: <b>24 h</b> ohne, <b>48 h</b> mit Dekompressionsstopp nicht fliegen.</li>
+<li>Kein Fliegen unter Alkohol, Drogen, Medikamenten, bei <b>Erkältung</b> oder Stirnhöhlenproblemen (Druckausgleich!).</li>
+<li>Viel trinken (wenig Zucker, keine Kohlensäure).</li>
+<li>Sauerstoff: Crew ab <b>10'000 ft</b> (länger als 30 min bis 13'000 ft), <b>alle</b> über <b>13'000 ft</b>.</li>
+<li>Kleidung aus <b>Naturfasern</b> (Baumwolle, Wolle …) – Kunststoff schmilzt bei Feuer auf der Haut.</li>
+</ul>
+<p class="note">Zusammenfassung von GuV 2026, Kap. 3.11 (sinngemäss)</p>` },
+        { t: 'Wirkung der Steuer (4.1)', b: `
+<p><b>Primäre Steuer:</b> Knüppel/Horn und Seitensteuerpedale mit den Rudern – Drehung um die drei Achsen. Sie sind <b>RATE CONTROLS</b>: Solange ausgeschlagen, dreht das Flugzeug weiter; nach Erreichen der Lage neutralisieren.</p>
+<p><b>Sekundäre Steuer:</b> Änderung der Triebwerkleistung und der Widerstände (z.&nbsp;B. Klappen).</p>
+<div class="exact"><span class="exact-tag">EXAKT · 4.1.3 Kasten</span>
+<p>Höhenruder / ELEVATOR – Querachse / PITCH AXIS<br>Querruder / AILERON – Längsachse / LONGITUDINAL AXIS<br>Seitenruder / RUDDER – Hochachse / VERTICAL AXIS</p></div>
+<ul>
+<li>Ziehen → Nase hebt sich → PITCH UP (ANU) · Stossen → PITCH DOWN (AND)</li>
+<li>Knüppel links/rechts → Flügel senkt sich → ROLL / BANK</li>
+<li>Pedal links/rechts → Nase dreht → YAW</li>
+</ul>
+<p><b>Kugel:</b> Seitensteuerdruck auf die Seite, wo die Kugel ist – <b>«auf die Kugel treten»</b>.</p>
+<p><b>Trimmen (4.2.3):</b> Steuerdruck zuerst mit Gegendruck halten, nach der Stabilisierung <b>wegtrimmen</b>. Nie die Fluglage mit der Trimmung ändern! Nach jeder Leistungs- oder Konfigurationsänderung nachtrimmen.</p>
+<p class="note">© Schweizerische Eidgenossenschaft, vertreten durch die Luftwaffe – GuV 2026, Kap. 4.1–4.2</p>` },
+        { t: 'Flügelklappen & Leistungshebel (4.4–4.6)', b: `
+<p>Ausfahren der Klappen bewirkt: <b>tiefere V<sub>STALL</sub></b>, <b>kürzere Startrollstrecke</b>, <b>kürzere Landerollstrecke</b> (mehr Auftrieb und mehr Widerstand).</p>
+<div class="exact"><span class="exact-tag">EXAKT · 4.4.7 Kasten</span>
+<p>Vor jeder Betätigung: Geschwindigkeit im zulässigen Bereich (weisser Bereich)?</p>
+<p>SPEED ……… <b>WHITE ARC</b><br>FLAPS ……… <b>… DEGREE / POSITION</b></p></div>
+<p>Dabei entstehen zwei Effekte: Profiländerung (Anstellwinkel) und Steigen durch mehr Auftrieb – <b>BALLOONING</b>. Ausgleich mit dem Höhensteuer.</p>
+<p><b>Leistungshebel:</b> vorne = FULL POWER, hinten = IDLE. Von Leerlauf bis Vollgas mindestens <b>2–3 Sekunden</b>, am Anfang langsam. Leistung flüssig, nie brüsk zurücknehmen.</p>
+<p class="note">© Schweizerische Eidgenossenschaft, vertreten durch die Luftwaffe – GuV 2026, Kap. 4.4–4.6</p>` },
+        { t: 'Rollen (4.13 & 5)', b: `
+<ul>
+<li>Knüppel/Horn: Wind und Unebenheiten ausgleichen · Pedale: Bugradsteuerung · Leistungshebel: Rollgeschwindigkeit · Fussbremsen: bremsen · Parkbremse: blockieren.</li>
+<li>Nicht mit Leistung <i>und</i> Bremse gleichzeitig rollen. Geschwindigkeit schätzt man besser seitlich hinaus.</li>
+<li>Bei jedem Anhalten Pedale in Neutralstellung.</li>
+</ul>
+<p><b>Rollwegmarkierungen:</b> Leitlinien <b>gelb</b> (verbindlich!), seitliche Begrenzung <b>weiss</b>, Randlichter <b>blau</b>. Abstand zur aktiven Piste: <b>30 m</b> (Piste unter 900 m), <b>50 m</b> (900 m und länger). Bei einer Kollision trägt der Kommandant die alleinige Verantwortung.</p>
+<div class="exact"><span class="exact-tag">EXAKT · 5.3.3 Kasten</span>
+<p><b>MOVE</b> – vor jedem Anrollen:<br>Taxi Area – CLEAR<br>Taxi Light – ON<br>Power – … SET<br>Parking Brake – RELEASED</p>
+<p><b>BRAKE CHECK</b> – sofort nach dem Anrollen:<br>Brakes – CHECKED</p>
+<p><b>STOP</b> – nach jedem Anhalten:<br>Parking Brake – SET<br>Power – … SET<br>Taxi Light – OFF</p></div>
+<p>Bremsprüfung nur so stark, dass du die Wirkung beurteilen kannst – nicht bis zum Stillstand.</p>
+<p class="note">© Schweizerische Eidgenossenschaft, vertreten durch die Luftwaffe – GuV 2026, Kap. 4.13, 5.2–5.3</p>` },
+        { t: 'Horizontalflug & Steigen (6–7)', b: `
+<p><b>Horizontalflug:</b> konstante Höhe (ALT), konstante Geschwindigkeit (ASI), VSI auf Null. Austrimmen: Steuerdruck halten bis stabil, dann wegtrimmen.</p>
+<p><b>V<sub>X</sub></b> = bester Steigwinkel (grösste Höhe pro Distanz) · <b>V<sub>Y</sub></b> = beste Steigrate (grösste Höhe pro Zeit) · <b>V<sub>CRUISE CLIMB</sub></b> = Reisesteigflug (z.&nbsp;B. bessere Motorkühlung).</p>
+<div class="exact"><span class="exact-tag">EXAKT · 7.2.4 Kasten – Übergang in den Steigflug (P-A-T)</span>
+<p>LOOKOUT<br>Mixture – RICH (OR ACC AFM)<br>Climb Power – SET (REQUIRED) FULL POWER <b>P</b><br>Climb Attitude – ADJUST FOR TYPE OF CLIMB <b>A</b><br>Trim – REDUCE LOAD ON CONTROLS <b>T</b></p></div>
+<div class="exact"><span class="exact-tag">EXAKT · 7.4.2 Kasten – Level off Cruise (A-P-T)</span>
+<p>Attitude – SET <b>A</b><br>Power – SET <b>P</b><br>Trim – SET <b>T</b><br>Landing Light – AS REQUIRED<br>CRUISE CHECK</p></div>
+<p><b>Merksatz «First Push»:</b> Bei jedem Übergang wird zuerst gestossen – Höhensteuer oder Leistungshebel. (Steigen: zuerst Gas → PAT. Level off: zuerst Nase runter → APT.)</p>
+<p><b>Faustregel:</b> Übergang beginnen bei <b>1/10 der Steigrate</b> unter der Zielhöhe. Beispiel: 1000 ft/min → 100 ft vorher. Erst nach der Leistungsreduktion fertig wegtrimmen.</p>
+<p class="note">© Schweizerische Eidgenossenschaft, vertreten durch die Luftwaffe – GuV 2026, Kap. 6–7</p>` },
+        { t: 'Sinkflug (8)', b: `
+<div class="exact"><span class="exact-tag">EXAKT · 8.2.4 Kasten – Starting Descent (A-P-T)</span>
+<p>LOOKOUT<br>Mixture – SET<br>Attitude – FOR DESCENT <b>A</b><br>Power – ADJUST <b>P</b><br>Trim – ADJUST <b>T</b></p></div>
+<p>Priorität beim Stabilisieren: <b>Lage halten</b>. Erst nach der Stabilisierung der Geschwindigkeit austrimmen – sonst geht das Flugzeug durch den zunehmenden Auftrieb wieder in den Horizontalflug (8.3.3).</p>
+<div class="exact"><span class="exact-tag">EXAKT · 8.4.1 Bild + Kasten – Level off (P-A-T)</span>
+<p>Power – SET <b>P</b><br>Attitude – SET <b>A</b><br>Trim – SET <b>T</b><br>Mixture – SET FOR ALTITUDE<br>CRUISE CHECK</p>
+<p>Ablauf: Vorbereitung → Übergang → Geschwindigkeitsabbau → Stabilisierung. Beginn bei <b>Rate of Descent / 10</b> über der neuen Höhe (z.&nbsp;B. 500 ft/min → 50 ft vorher).</p></div>
+<p><b>Gleitflug</b> = Sinkflug ohne Triebwerkleistung. <b>V<sub>BEST GLIDE</sub></b> = weiteste Distanz (auswendig wissen!), V<sub>BEST ENDURANCE</sub> = geringste Sinkrate, längste Zeit.</p>
+<p class="note">© Schweizerische Eidgenossenschaft, vertreten durch die Luftwaffe – GuV 2026, Kap. 8</p>` },
+        { t: 'Kurven (9)', b: `
+<p><b>Referenz:</b> Ein Punkt auf der Frontscheibe wird dem Scheinhorizont entlang geführt – nicht dem Gelände entlang. Bei nebeneinander liegenden Sitzen sieht das in Links- und Rechtskurve unterschiedlich aus.</p>
+<p><b>LOOKOUT (9.2.1):</b> Kopf in Kurvenrichtung, horizontal bis zur Gegenseite absuchen, dann Kopf anheben und den Luftraum über dem Flugzeug zurück absuchen. Call out: <b>«left side clear»</b> / <b>«right side clear»</b>. Danach die Kurve sofort einleiten.</p>
+<p><b>Einleiten:</b> flüssig und koordiniert, mit Querruder in Kurvenrichtung.</p>
+<p><b>Negatives Wendemoment / ADVERSE YAW:</b> Das Flugzeug giert zur Kurvenaussenseite (Querruder unten = mehr Auftrieb <i>und</i> mehr Widerstand). Ausgleich mit Seitensteuer in Kurvenrichtung – bei Schulflugzeugen immer!</p>
+<p><b>In der Kurve:</b> Leicht am Höhensteuer ziehen (mehr Auftrieb nötig). Bei 30° Querlage steigt V<sub>STALL</sub> um ca. 7 %.</p>
+<p><b>Ausleiten:</b> LOOKOUT zur Kurvenaussenseite, bei mittleren Kurven ca. <b>10° vor dem neuen Kurs</b> aufrichten und Höhensteuer nachlassen/leicht nachdrücken – sonst steigt das Flugzeug.</p>
+<p class="note">Zusammenfassung von GuV 2026, Kap. 9</p>` },
+        { t: 'Start (12)', b: `
+<div class="exact"><span class="exact-tag">EXAKT · 12.4.1 Static Take-off</span>
+<p>THROTTLE – T/O POWER<br>POWER – MIN … RPM<br>BRAKES – RELEASED AND FREE</p></div>
+<div class="exact"><span class="exact-tag">EXAKT · 12.4.1 Rolling Take-off</span>
+<p>BRAKES – RELEASED AND FREE<br>THROTTLE – T/O POWER<br>POWER – MIN … RPM</p></div>
+<p>Absätze auf den Kabinenboden (keine ungewollte Bremse). Leistungshebel in 2–3 Sekunden nach vorne.</p>
+<div class="exact"><span class="exact-tag">EXAKT · 12.4.2 Acceleration Check</span>
+<p>AIRSPEED – RISING</p></div>
+<ul>
+<li><b>50/70-Regel:</b> 70 % der Abhebegeschwindigkeit bis zur Pistenmitte – sonst Start abbrechen.</li>
+<li><b>HOTAS:</b> Hands On Throttle And Stick. Beim Steuerhorn: Rotieren mit beiden Händen, dann zurück an den Leistungshebel; frei ab 300 ft AAL.</li>
+<li>Rechtsdrehender Propeller → starke <b>Ausbrechtendenz nach links</b> (Slipstream). Mit dem Seitensteuer die Centerline verteidigen, Flügel mit Querruder horizontal. Im Zweifel: Start abbrechen.</li>
+<li>Rotieren ca. <b>10 kt vor V<sub>X</sub></b>. Nie vom Boden wegreissen. Mit V<sub>X</sub> über Hindernisse, dann V<sub>Y</sub>.</li>
+</ul>
+<div class="exact"><span class="exact-tag">EXAKT · 12.5.2 Flaps Retraction</span>
+<p>CLEAR OF OBSTACLES – SPEED CHECKED, FLAPS UP</p></div>
+<p>Klappen einfahren, wenn: Steiggeschwindigkeit clean erreicht, Hindernisse überflogen, Steigfluglage stabil. <b>Aux Fuel Pump</b> frühestens <b>500 ft AAL</b> aus (Benzindruck prüfen!). Möglichst die ganze Pistenlänge nutzen.</p>
+<p class="note">© Schweizerische Eidgenossenschaft, vertreten durch die Luftwaffe – GuV 2026, Kap. 12</p>` },
+        { t: 'Platzrunde & Landung (13)', b: `
+<p><b>Standardplatzrunde:</b> Abflug → Querabflug (CROSSWIND) → Gegenanflug (DOWNWIND, ca. <b>1000 ft AAL</b>) → Queranflug (BASE) → Endanflug (FINAL), Anflugwinkel ca. 3°. Für jedes Segment sind Position, Länge, Höhe und Abstand zur Piste festgelegt.</p>
+<p><b>Pistenbild:</b> Hoher Anflug → früh Leistung reduzieren, Tendenz kurze Landung. Tiefer Anflug → viel Leistung, schlechte Sicht nach vorne, Tendenz lange Landung.</p>
+<p><b>Stabilisierter Endanflug</b> (spätestens im letzten Drittel):</p>
+<ul><li>Endanflug-Konfiguration erstellt, Klappen nicht mehr verändern, Geschwindigkeit stabil</li><li>ausgetrimmt, LANDING CHECK erledigt</li><li><b>ON CENTERLINE AND GLIDE PATH</b>: Gleitweg mit <b>Pitch</b>, Geschwindigkeit mit <b>Power</b> korrigieren</li></ul>
+<p>Aufsetzen mit dem Hauptfahrwerk in der Landezone. Zehen weg von den Bremsen. Im Gate: Power idle, Hand bleibt am Leistungshebel – bereit für ein Go-around.</p>
+<p class="note">Zusammenfassung von GuV 2026, Kap. 13</p>` },
+        { t: 'Notfälle: F-N-C-E-E-D (11)', b: `
+<p>Gegen den Schreckeffekt (STARTLE EFFECT) gibt es ein Grundverfahren, das <b>immer in dieser Reihenfolge</b> abgearbeitet wird:</p>
+<ol>
+<li><b>FLY</b> – Fluglage stabilisieren, Leistung setzen, Geschwindigkeit (z.&nbsp;B. V<sub>BEST GLIDE</sub>), Konfiguration, trimmen</li>
+<li><b>NAVIGATE</b> – Flugweg sicher vor Gelände, Hindernissen, Wetter, Luftraum</li>
+<li><b>COMMUNICATE</b> – ATC, Crew, Passagiere; allenfalls PAN PAN (3×) oder MAYDAY (3×), Transponder 7700</li>
+<li><b>EVALUATE</b> – Situation prüfen, passendes Verfahren festlegen</li>
+<li><b>EXECUTE</b> – Verfahren umsetzen (z.&nbsp;B. EMERGENCY CHECKLIST)</li>
+<li><b>DECISION MAKING</b> – weiteres Vorgehen entscheiden und kommunizieren</li>
+</ol>
+<p>Erst wenn FLY, NAVIGATE und COMMUNICATE erledigt sind, mit EVALUATE beginnen. Die Punkte laut ausrufen hilft.</p>
+<p class="note">Zusammenfassung von GuV 2026, Kap. 11.1</p>` },
+      ],
+      questions: [
+        { q: 'Wofür steht «VSI»?', a: ['Vertical Speed Indicator', 'Visual Speed Indicator', 'Vertical Stall Indicator', 'Velocity System Indicator'], c: 0, e: 'VSI – VERTICAL SPEED INDICATOR – Vertikale Geschwindigkeits-Anzeige (GuV 1.2.3.1).' },
+        { q: 'Welches Instrument zeigt die Lage (ATTITUDE)?', a: ['AI – Attitude Indicator', 'ASI', 'DG', 'VSI'], c: 0, e: 'Einziges Instrument für die Lage ist der AI. Die anderen sind Leistungsanzeigen.' },
+        { q: 'Was bezeichnet V_NE?', a: ['Never Exceed Speed', 'Normal Operation Speed', 'Stall Speed Clean', 'Max. Flaps Extended Speed'], c: 0, e: 'V_NE – rote Linie auf dem ASI.' },
+        { q: 'Wo beginnt der weisse Bogen auf dem ASI?', a: ['Bei V_SO', 'Bei V_S1', 'Bei V_NO', 'Bei V_FE'], c: 0, e: 'V_SO = Stall Speed in Landing Configuration. Ende des weissen Bogens = V_FE.' },
+        { q: 'Was meldest du bei einem Checklisten-Punkt «AS REQUIRED»?', a: ['Den aktuell verlangten Wert', '«As required»', 'Nichts', '«Checked»'], c: 0, e: 'Es wird nie «AS REQUIRED» gemeldet (GuV 2.9.3).' },
+        { q: 'Was sagt der Pilot Flying, wenn er die Steuer übergibt?', a: ['«YOU HAVE CONTROLS»', '«I HAVE CONTROLS»', '«TAKE OVER»', '«CONTROLS FREE»'], c: 0, e: 'PF: YOU HAVE CONTROLS – PM: I HAVE CONTROLS (GuV 3.5).' },
+        { q: 'Ist eine Steuerübergabe auch eine Kommandoübergabe?', a: ['Nein, niemals', 'Ja, immer', 'Nur im Notfall', 'Nur am Boden'], c: 0, e: 'Die Steuerübergabe ist keine Kommandoübergabe (GuV 3.5).' },
+        { q: 'Wie meldest du Verkehr rechts von dir, etwas höher?', a: ['«TRAFFIC, THREE O\'CLOCK, HIGH»', '«TRAFFIC RIGHT ABOVE»', '«PLANE AT NINE, HIGH»', '«TRAFFIC, THREE O\'CLOCK, LOW»'], c: 0, e: 'Uhrzifferblatt: 3 Uhr = rechts. Bestätigung: «IN SIGHT».' },
+        { q: 'Nach wie vielen Sekunden ist man ohne Horizont spätestens in einer unkontrollierbaren Lage?', a: ['170', '30', '600', '1000'], c: 0, e: 'Untersuchungen: spätestens nach 170 Sekunden (GuV 3.1.5).' },
+        { q: 'Welches Ruder dreht das Flugzeug um die Längsachse?', a: ['Querruder / AILERON', 'Höhenruder / ELEVATOR', 'Seitenruder / RUDDER', 'Trimmruder'], c: 0, e: 'AILERON – LONGITUDINAL AXIS (GuV 4.1.3).' },
+        { q: 'Die Kugel ist rechts. Was tust du?', a: ['Rechtes Pedal drücken', 'Linkes Pedal drücken', 'Querruder rechts', 'Gas geben'], c: 0, e: '«Auf die Kugel treten» (GuV 4.1.8).' },
+        { q: 'Darfst du die Fluglage mit der Trimmung ändern?', a: ['Nein – nur Steuerdruck wegtrimmen', 'Ja, das ist bequemer', 'Nur im Steigflug', 'Nur mit Fluglehrer'], c: 0, e: 'Erst Lage mit dem Steuer stabilisieren, dann wegtrimmen (GuV 4.2.3).' },
+        { q: 'Was prüfst du vor jeder Betätigung der Klappen?', a: ['SPEED – WHITE ARC', 'Fuel – CHECKED', 'Trim – SET', 'Mixture – RICH'], c: 0, e: 'SPEED – WHITE ARC, FLAPS – … DEGREE/POSITION (GuV 4.4.7).' },
+        { q: 'Wie heisst das Steigen beim Ausfahren der Klappen?', a: ['BALLOONING', 'FLARE', 'ADVERSE YAW', 'P-FACTOR'], c: 0, e: 'Auftriebserhöhung → BALLOONING, mit Höhensteuer kompensieren.' },
+        { q: 'Was meldest du beim MOVE als Erstes?', a: ['Taxi Area – CLEAR', 'Parking Brake – RELEASED', 'Power – SET', 'Brakes – CHECKED'], c: 0, e: 'Taxi Area CLEAR, Taxi Light ON, Power SET, Parking Brake RELEASED (GuV 5.3.3).' },
+        { q: 'Welche Farbe haben Rollwegleitlinien?', a: ['Gelb', 'Weiss', 'Blau', 'Grün'], c: 0, e: 'Leitlinien gelb, seitliche Begrenzung weiss, Randlichter blau (GuV 5.2.1).' },
+        { q: 'Mindestabstand zur aktiven Piste (900 m oder länger)?', a: ['50 m', '30 m', '10 m', '100 m'], c: 0, e: 'Unter 900 m Länge: 30 m, ab 900 m: 50 m (GuV 5.2.4).' },
+        { q: 'Was ist V_Y?', a: ['Geschwindigkeit für die beste Steigrate', 'Geschwindigkeit für den besten Steigwinkel', 'Reisesteiggeschwindigkeit', 'Abhebegeschwindigkeit'], c: 0, e: 'V_Y = grösste Höhe pro Zeit; V_X = grösste Höhe pro Distanz.' },
+        { q: 'Reihenfolge beim Übergang in den Steigflug?', a: ['Power – Attitude – Trim', 'Attitude – Power – Trim', 'Trim – Power – Attitude', 'Attitude – Trim – Power'], c: 0, e: 'PAT – «First Push»: zuerst den Leistungshebel stossen (GuV 7.2.4).' },
+        { q: 'Steigrate 800 ft/min. Wann beginnst du den Level off?', a: ['80 ft vor der Zielhöhe', '800 ft vorher', '8 ft vorher', 'Erst auf der Zielhöhe'], c: 0, e: 'Faustregel: 1/10 der Steigrate (GuV 7.4.3).' },
+        { q: 'Reihenfolge beim Einleiten des Sinkflugs?', a: ['Attitude – Power – Trim', 'Power – Attitude – Trim', 'Trim – Attitude – Power', 'Power – Trim – Attitude'], c: 0, e: 'APT – «First Push»: zuerst Nase runter (GuV 8.2.4).' },
+        { q: 'Reihenfolge beim Level off aus dem Sinkflug?', a: ['Power – Attitude – Trim', 'Attitude – Power – Trim', 'Trim – Power – Attitude', 'Attitude – Trim – Power'], c: 0, e: 'PAT: zuerst Leistung erhöhen (GuV 8.4.1).' },
+        { q: 'Call out vor einer Linkskurve?', a: ['«left side clear»', '«turning left»', '«clear left and right»', '«lookout complete»'], c: 0, e: 'GuV 9.2.1.' },
+        { q: 'Wann beginnst du bei einer mittleren Kurve mit dem Ausleiten?', a: ['Ca. 10° vor dem neuen Kurs', 'Genau auf dem neuen Kurs', '45° vorher', '1° vorher'], c: 0, e: 'GuV 9.4.2.' },
+        { q: 'Was meldest du beim Acceleration Check?', a: ['AIRSPEED – RISING', 'POWER – SET', 'ENGINE – GREEN', 'SPEED – CHECKED'], c: 0, e: 'GuV 12.4.2.' },
+        { q: 'Was bedeutet die 50/70-Regel beim Start?', a: ['70 % der Abhebegeschwindigkeit bis zur Pistenmitte', '50 kt bei 70 % der Piste', '50 % Leistung, 70 % Klappen', '70 m Rollstrecke pro 50 kt'], c: 0, e: 'Sonst Start abbrechen (GuV 12.4.2).' },
+        { q: 'In welche Richtung bricht ein Flugzeug mit rechtsdrehendem Propeller beim Startlauf aus?', a: ['Nach links', 'Nach rechts', 'Gar nicht', 'Nach oben'], c: 0, e: 'Slipstream-Effekt → Seitensteuer rechts (GuV 12.4.4).' },
+        { q: 'Frühestens ab welcher Höhe schaltest du die elektrische Hilfspumpe aus?', a: ['500 ft AAL', '50 ft AAL', '1000 ft AAL', 'Direkt nach dem Abheben'], c: 0, e: 'Steigflug stabil, Benzindruck im grünen Bereich (GuV 12.5.3).' },
+        { q: 'Was ist das erste «F» in F-N-C-E-E-D?', a: ['FLY', 'FIRE', 'FUEL', 'FLAPS'], c: 0, e: 'FLY – NAVIGATE – COMMUNICATE – EVALUATE – EXECUTE – DECISION MAKING.' },
+        { q: 'Womit korrigierst du im stabilisierten Endanflug den Gleitweg?', a: ['Mit der Lage (Pitch)', 'Mit der Leistung', 'Mit den Klappen', 'Mit der Trimmung'], c: 0, e: 'Gleitweg mit Pitch, Geschwindigkeit mit Power (GuV 13.7.1).' },
+        { q: 'Wie viele Flüge umfasst der SPHAIR-Flugkurs?', a: ['11', '5', '20', '3'], c: 0, e: '11 Flüge à 40–50 Minuten.' },
+        { q: 'Wann wird dein «Need to know» geprüft?', a: ['Am 1. Kurstag im Eintrittstest', 'Am Screening', 'Am letzten Tag', 'Gar nicht'], c: 0, e: '«Are you ready for departure?»: Eintrittstest bei Kursbeginn.' },
       ],
     },
     {
@@ -461,7 +681,7 @@
 <li><b>F</b>atigue – müde?</li>
 <li><b>E</b>ating / Emotion</li>
 </ul>
-<p>Mit Erkältung nicht fliegen: Druckausgleich der Ohren kann im Sinkflug sehr schmerzhaft werden. Nach dem Tauchen 12–24 h nicht fliegen.</p>` },
+<p>Mit Erkältung nicht fliegen: Druckausgleich der Ohren kann im Sinkflug sehr schmerzhaft werden. Nach Tiefseetauchen 24 h (mit Dekompressionsstopp 48 h) nicht fliegen.</p>` },
         { t: 'Entscheiden mit FORDEC', b: `
 <p>Viele Airlines nutzen <b>FORDEC</b>:</p>
 <ol><li><b>F</b>acts – Was ist los?</li><li><b>O</b>ptions – Welche Möglichkeiten?</li><li><b>R</b>isks & Benefits</li><li><b>D</b>ecision</li><li><b>E</b>xecution</li><li><b>C</b>heck – Hat es funktioniert?</li></ol>

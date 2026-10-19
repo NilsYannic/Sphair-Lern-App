@@ -361,6 +361,72 @@ ${[-10, -5, 5, 10].map((p) => `<line x1="${-8 - Math.abs(p)}" x2="${8 + Math.abs
     };
   }
 
+
+  // ---------- Flugkurs: Verfahren wörtlich (GuV «exakt») ----------
+  const PROCS = [
+    { n: 'MOVE (vor jedem Anrollen)', ref: '5.3.3', l: [['Taxi Area', 'CLEAR'], ['Taxi Light', 'ON'], ['Power', '… SET'], ['Parking Brake', 'RELEASED']] },
+    { n: 'BRAKE CHECK', ref: '5.3.3', l: [['Brakes', 'CHECKED']] },
+    { n: 'STOP (nach jedem Anhalten)', ref: '5.3.3', l: [['Parking Brake', 'SET'], ['Power', '… SET'], ['Taxi Light', 'OFF']] },
+    { n: 'Übergang in den Steigflug (PAT)', ref: '7.2.4', l: [['LOOKOUT', '–'], ['Mixture', 'RICH (OR ACC AFM)'], ['Climb Power', 'SET (REQUIRED) FULL POWER'], ['Climb Attitude', 'ADJUST FOR TYPE OF CLIMB'], ['Trim', 'REDUCE LOAD ON CONTROLS']] },
+    { n: 'Level off Cruise aus dem Steigflug (APT)', ref: '7.4.2', l: [['Attitude', 'SET'], ['Power', 'SET'], ['Trim', 'SET'], ['Landing Light', 'AS REQUIRED'], ['CRUISE CHECK', '–']] },
+    { n: 'Starting Descent (APT)', ref: '8.2.4', l: [['LOOKOUT', '–'], ['Mixture', 'SET'], ['Attitude', 'FOR DESCENT'], ['Power', 'ADJUST'], ['Trim', 'ADJUST']] },
+    { n: 'Level off aus dem Sinkflug (PAT)', ref: '8.4.1', l: [['Power', 'SET'], ['Attitude', 'SET'], ['Trim', 'SET'], ['Mixture', 'SET FOR ALTITUDE'], ['CRUISE CHECK', '–']] },
+    { n: 'Klappen aus-/einfahren', ref: '4.4.7', l: [['SPEED', 'WHITE ARC'], ['FLAPS', '… DEGREE/POSITION']] },
+    { n: 'Static Take-off', ref: '12.4.1', l: [['THROTTLE', 'T/O POWER'], ['POWER', 'MIN … RPM'], ['BRAKES', 'RELEASED AND FREE']] },
+    { n: 'Rolling Take-off', ref: '12.4.1', l: [['BRAKES', 'RELEASED AND FREE'], ['THROTTLE', 'T/O POWER'], ['POWER', 'MIN … RPM']] },
+    { n: 'Acceleration Check', ref: '12.4.2', l: [['AIRSPEED', 'RISING']] },
+    { n: 'Flaps Retraction', ref: '12.5.2', l: [['CLEAR OF OBSTACLES', 'SPEED CHECKED, FLAPS UP']] },
+    { n: 'Übergabe der Steuer (PF → PM)', ref: '3.5', l: [['PF', '«YOU HAVE CONTROLS»'], ['PM', '«I HAVE CONTROLS»']] },
+    { n: 'Notfall-Grundverfahren', ref: '11.1.2', l: [['1.', 'FLY'], ['2.', 'NAVIGATE'], ['3.', 'COMMUNICATE'], ['4.', 'EVALUATE'], ['5.', 'EXECUTE'], ['6.', 'DECISION MAKING']] },
+  ];
+  const ALL_VALUES = [...new Set(PROCS.flatMap((p) => p.l.map((x) => x[1])).filter((v) => v !== '–'))];
+
+  function procTask() {
+    const p = pick(PROCS);
+    const items = p.l.filter((x) => x[1] !== '–');
+    if (p.l.length >= 3 && Math.random() < 0.4) {
+      // Reihenfolge: Was kommt nach …?
+      const i = rnd(0, p.l.length - 2);
+      const ans = `${p.l[i + 1][0]}${p.l[i + 1][1] !== '–' ? ` – ${p.l[i + 1][1]}` : ''}`;
+      const others = shuffle(p.l.filter((_, j) => j !== i + 1).map((x) => `${x[0]}${x[1] !== '–' ? ` – ${x[1]}` : ''}`));
+      const opts = [...new Set([ans, ...others])].slice(0, 4);
+      return { kind: 'mc', prompt: `<p class="tag">GuV ${p.ref}</p><p class="big-q">${p.n}</p><p>Was kommt nach <b>${p.l[i][0]}${p.l[i][1] !== '–' ? ` – ${p.l[i][1]}` : ''}</b>?</p>`, options: opts, answer: ans, time: 20, explain: p.l.map((x) => `${x[0]}${x[1] !== '–' ? ` – ${x[1]}` : ''}`).join(' · ') };
+    }
+    const [k, v] = pick(items);
+    const opts = new Set([v]);
+    for (const x of shuffle(items.map((y) => y[1]))) if (opts.size < 4) opts.add(x);
+    for (const x of shuffle(ALL_VALUES)) if (opts.size < 4) opts.add(x);
+    return { kind: 'mc', prompt: `<p class="tag">GuV ${p.ref}</p><p class="big-q">${p.n}</p><p><b>${k}</b> ……… ?</p>`, options: [...opts], answer: v, time: 15, explain: p.l.map((x) => `${x[0]}${x[1] !== '–' ? ` – ${x[1]}` : ''}`).join(' · ') };
+  }
+
+  // ---------- Flugkurs: Checkliste der eigenen Flugschule ----------
+  function checklistOf() {
+    const all = window.CHECKLISTS || {};
+    const key = window.Store?.settings.school;
+    return all[key] ? { key, ...all[key] } : { key: Object.keys(all).find((k) => k.startsWith('Bern-Belp')) || Object.keys(all)[0], ...all[Object.keys(all).find((k) => k.startsWith('Bern-Belp')) || Object.keys(all)[0]] };
+  }
+
+  function checklistTask(level) {
+    const cl = checklistOf();
+    const checks = cl.checks.filter((c) => c.items.length >= 2);
+    const c = pick(checks);
+    const i = rnd(0, c.items.length - 1);
+    const [k, v] = c.items[i];
+    const head = `<p class="tag">${cl.key}</p><p class="big-q">${c.name}</p>`;
+    const full = c.items.map((x, j) => `${j + 1}. ${x[0]} – ${x[1]}`).join('<br>');
+    if (level > 1 && i < c.items.length - 1 && Math.random() < 0.5) {
+      const nxt = c.items[i + 1][0];
+      const opts = new Set([nxt]);
+      for (const x of shuffle(c.items.map((y) => y[0]))) if (opts.size < 4 && x !== k) opts.add(x);
+      for (const x of shuffle(checks.flatMap((y) => y.items.map((z) => z[0])))) if (opts.size < 4 && x !== k) opts.add(x);
+      return { kind: 'mc', html: true, prompt: `${head}<p>Welcher Punkt kommt nach <b>${i + 1}. ${k}</b>?</p>`, options: [...opts], answer: nxt, time: 20, explain: full };
+    }
+    const opts = new Set([v]);
+    for (const x of shuffle(c.items.map((y) => y[1]))) if (opts.size < 4) opts.add(x);
+    for (const x of shuffle(checks.flatMap((y) => y.items.map((z) => z[1])))) if (opts.size < 4) opts.add(x);
+    return { kind: 'mc', prompt: `${head}<p><b>${i + 1}. ${k}</b> ……… ?</p>`, options: [...opts], answer: v, time: 15, explain: full };
+  }
+
   // ---------- Trainer-Definitionen ----------
   const TRAINERS = [
     { id: 'kopf', name: 'Kopfrechnen', icon: '➗', block: 1, desc: 'Schnell und ohne Notizen – visuell', count: 12,
@@ -380,7 +446,9 @@ ${[-10, -5, 5, 10].map((p) => `<line x1="${-8 - Math.abs(p)}" x2="${8 + Math.abs
     { id: 'rechnen', name: 'Rechenaufgaben', icon: '✈️', block: 3, desc: 'Zeit, Distanz, Treibstoff, Einheiten', count: 8,
       make: (l) => { const w = wordProblem(l); return { kind: 'text', numeric: true, prompt: `<p>${w.q}</p>${w.unit ? `<p class="hint">Antwort in ${w.unit}</p>` : ''}`, answer: fmt(w.a), tol: Math.max(0.1, Math.abs(w.a) * 0.02), time: 40 }; } },
     { id: 'multi', name: 'Multitasking', icon: '🕹️', block: 4, desc: 'Psychomotorik + Mehrfachaufgaben', count: 1, custom: true },
+    { id: 'verfahren', name: 'Verfahren auswendig', icon: '🗣️', block: 5, desc: 'GuV-Kästen «exakt» wörtlich', count: 12, make: procTask },
+    { id: 'checkliste', name: 'Checkliste', icon: '📋', block: 5, desc: 'Checkliste deiner SPHAIR-Flugschule', count: 12, make: checklistTask },
   ];
 
-  window.Trainers = { TRAINERS, get: (id) => TRAINERS.find((t) => t.id === id), shuffle, fmt };
+  window.Trainers = { TRAINERS, get: (id) => TRAINERS.find((t) => t.id === id), shuffle, fmt, checklistOf };
 })();

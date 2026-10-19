@@ -321,3 +321,16 @@ body.in-chat main { padding-bottom: 0; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 
 button, input, select, textarea { font-family: var(--font); }
+
+/* GuV «exakt»-Kästen */
+.exact { border: 2px solid var(--c, var(--accent)); border-radius: 14px; padding: 10px 14px; margin: 12px 0; background: color-mix(in srgb, var(--c, var(--accent)) 6%, transparent); }
+.exact p { margin: .35em 0; }
+.exact-tag { display: inline-block; font: 800 .7rem/1 var(--font); letter-spacing: .06em; color: #fff; background: var(--c, var(--accent)); padding: 4px 8px; border-radius: 6px; }
+
+/* Checkliste */
+.cl h2 { font-size: .95rem; letter-spacing: .03em; }
+.cl ol { margin: 8px 0 0; padding-left: 0; list-style: none; }
+.cl li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+.cl li span { flex: 1; }
+.clv { text-align: right; font-weight: 700; color: var(--accent); }
+#clList.hide .clv:not(.show) { color: transparent; background: var(--line); border-radius: 6px; min-width: 90px; cursor: pointer; user-select: none; }

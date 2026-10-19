@@ -16,6 +16,7 @@
     streak: { count: 0, best: 0, last: '' },
     days: {},       // 'YYYY-MM-DD' -> { done: [taskIds], xp }
     lessons: {},    // 'topic:index' -> true
+    heft: {},       // 'abschnitt' -> true (gelesen im GuV-Heft)
     cards: {},      // 'topic:index' -> { box, due }
     topics: {},     // topicId -> { right, wrong }
     trainers: {},   // trainerId -> { runs, best, last: [scores] }

@@ -168,6 +168,7 @@ ${daysLeft != null ? `<section class="card countdown"><div><b>${daysLeft > 0 ? d
     activeTask = null;
     view.innerHTML = `
 <section class="hero"><h1>Lernen</h1><p class="muted">Die Theorie für Flugkurs und Airline-Weg. Lies die Lektionen, dann festigt das Quiz dein Wissen.</p></section>
+<a class="card review heft-card" href="#heft"><span class="ticon">📕</span><span class="tt"><b>Das Heft: Grundlagen & Verfahren</b><small>Das komplette offizielle SPHAIR-Lehrbuch · ${Object.keys(S.data.heft).length} Abschnitte gelesen</small></span><span class="chev">›</span></a>
 <a class="card review" href="#checkliste"><span class="ticon">📋</span><span class="tt"><b>Checkliste deiner Flugschule</b><small>${esc(T.checklistOf().key)} – offizielle SPHAIR-Checkliste</small></span><span class="chev">›</span></a>
 <a class="card review" href="#quiz/all"><span class="ticon">🔁</span><span class="tt"><b>Fällige Karten wiederholen</b><small>${dueAll().length} Fragen sind heute dran</small></span><span class="chev">›</span></a>
 <div class="grid">
@@ -381,6 +382,122 @@ ${!untimed && item.time ? '<div class="bar timer"><i id="tBar"></i></div>' : ''}
     }
 
     next();
+  }
+
+  // ---------- Das Heft: Grundlagen & Verfahren (GuV) ----------
+  const GUV_PDF = 'https://storagesphairprod.blob.core.windows.net/strapimedia-abn/assets/2026_GUV_d_401edd35e6.pdf';
+  // Kapitel aus der offiziellen «Need to know»-Liste (werden am 1. Kurstag geprüft)
+  const NEED = ['1.2.2', '1.2.3', '2.9.1', '2.9.2', '2.9.3', '2.9.4', '2.9.5', '2.9.6', '2.9.7', '2.9.8', '3.1.3', '3.1.4', '3.1.5', '3.3.1', '3.5', '3.6.1', '3.9', '3.11', '4.1.1', '4.1.2', '4.1.3', '4.1.4', '4.1.8', '4.2.3', '4.4.3', '4.4.5', '4.4.7', '4.6.2', '4.6.3', '4.6.4', '4.13', '5.2.1', '5.2.2', '5.3.3', '6.2', '7.2.3', '7.2.4', '7.4.2', '7.4.3', '8.2.4', '8.3.3', '8.4.1', '9.1.4', '9.2.1', '9.2.2', '9.2.3', '9.4', '12.4', '12.5.2', '12.5.3', '12.5.4', '12.9.1', '13.1', '13.5.4', '13.7.1', '13.7.4'];
+  const isNeed = (n) => NEED.some((x) => n === x || n.startsWith(`${x}.`));
+  let heftPromise;
+  function loadHeft() {
+    if (window.HEFT) return Promise.resolve(window.HEFT);
+    return (heftPromise ||= new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'js/heft.js';
+      s.onload = () => res(window.HEFT);
+      s.onerror = () => { heftPromise = null; rej(new Error('Heft konnte nicht geladen werden')); };
+      document.head.appendChild(s);
+    }));
+  }
+  const plain = (h) => h.replace(/<[^>]+>/g, ' ').replace(/&[a-z#0-9]+;/gi, ' ').replace(/\s+/g, ' ');
+  const normTxt = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const sectionKey = (s) => s.n;
+  const readable = (c) => c.s.filter((s) => s.h.length > 40);
+
+  async function renderHeft(c, i) {
+    view.innerHTML = '<p class="muted" style="padding:40px 0;text-align:center">Heft wird geladen…</p>';
+    let H;
+    try { H = await loadHeft(); } catch (e) { view.innerHTML = `<section class="card"><p>${esc(e.message)}. Bist du online?</p></section>`; return; }
+    if (c == null) return renderHeftIndex(H);
+    const ch = H.find((x) => String(x.c) === String(c));
+    if (!ch) return go('#heft');
+    if (i == null) return renderHeftChapter(ch);
+    return renderHeftSection(H, ch, Number(i));
+  }
+
+  function heftProgress(ch) {
+    const r = readable(ch);
+    return r.length ? Math.round((r.filter((s) => S.data.heft[sectionKey(s)]).length / r.length) * 100) : 0;
+  }
+
+  function renderHeftIndex(H) {
+    const total = H.reduce((a, c) => a + readable(c).length, 0);
+    const done = H.reduce((a, c) => a + readable(c).filter((s) => S.data.heft[sectionKey(s)]).length, 0);
+    view.innerHTML = `
+<a class="back" href="#lernen">‹ Lernen</a>
+<section class="hero"><h1>Das Heft</h1><p class="muted">«Grundlagen und Verfahren» 2026 – das offizielle SPHAIR-Lehrbuch für den Flugkurs, komplett. <span class="need-tag">Need to know</span> = wird am 1. Kurstag geprüft.</p></section>
+<section class="card">
+  <div class="card-head"><h2>Dein Fortschritt</h2><span class="muted">${done}/${total} Abschnitte</span></div>
+  <div class="bar"><i style="width:${total ? (done / total) * 100 : 0}%"></i></div>
+  <form class="search" id="hSearch"><input id="hq" type="search" placeholder="Im Heft suchen, z.B. «Vergaser» oder «Platzrunde»" autocomplete="off"></form>
+  <div id="hRes"></div>
+</section>
+<ul class="chapters">${H.map((c) => { const p = heftProgress(c); const need = c.s.some((s) => isNeed(s.n)); return `<li><a class="card chap" href="#heft/${c.c}">
+  <span class="cnum">${c.c}</span><span class="tt"><b>${esc(c.t)}</b><small>${esc(c.en)}${need ? ' · <span class="need-tag">Need to know</span>' : ''}</small><span class="bar"><i style="width:${p}%"></i></span></span><span class="chev">›</span></a></li>`; }).join('')}</ul>
+<p class="note">© 2026 Schweizerische Eidgenossenschaft, vertreten durch die Luftwaffe. Text aus dem PDF übernommen; Bilder und Zeichnungen findest du über «Seite im PDF» in jedem Abschnitt. <a href="${GUV_PDF}" target="_blank" rel="noopener">Original-PDF öffnen</a></p>`;
+    const res = $('#hRes');
+    const search = () => {
+      const q = normTxt($('#hq').value.trim());
+      if (q.length < 3) { res.innerHTML = ''; return; }
+      const hits = [];
+      for (const c of H) c.s.forEach((s, i) => {
+        if (s.h.length <= 40) return;
+        const txt = plain(s.h); const t = normTxt(`${s.t} ${txt}`);
+        const at = t.indexOf(q);
+        if (at >= 0) hits.push({ c, s, i, snip: txt.slice(Math.max(0, at - s.t.length - 60), at - s.t.length + 90) });
+      });
+      res.innerHTML = hits.length ? `<p class="muted small">${hits.length} Treffer</p><ul class="hits">${hits.slice(0, 40).map((h) => `<li><a href="#heft/${h.c.c}/${h.i}"><b>${h.s.n} ${esc(h.s.t)}</b><small>…${esc(h.snip)}…</small></a></li>`).join('')}</ul>` : '<p class="muted small">Nichts gefunden.</p>';
+    };
+    let t;
+    $('#hq').addEventListener('input', () => { clearTimeout(t); t = setTimeout(search, 200); });
+    $('#hSearch').addEventListener('submit', (e) => { e.preventDefault(); search(); });
+  }
+
+  function renderHeftChapter(ch) {
+    view.innerHTML = `
+<a class="back" href="#heft">‹ Das Heft</a>
+<section class="hero"><p class="muted">Kapitel ${ch.c} · ${esc(ch.en)}</p><h1>${esc(ch.t)}</h1></section>
+<section class="card">
+  <div class="card-head"><h2>Abschnitte</h2><span class="muted">${heftProgress(ch)} % gelesen</span></div>
+  <ul class="tasks sec-list">${ch.s.map((s, i) => {
+    const depth = s.n.split('.').length;
+    if (s.h.length <= 40) return `<li class="sec-head d${depth}">${s.n} ${esc(s.t)}</li>`;
+    const r = S.data.heft[sectionKey(s)];
+    return `<li><a class="task ${r ? 'done' : ''} d${depth}" href="#heft/${ch.c}/${i}"><span class="snum">${r ? '✓' : s.n}</span><span class="tt"><b>${esc(s.t)}</b>${isNeed(s.n) ? '<small><span class="need-tag">Need to know</span></small>' : ''}</span><span class="chev">›</span></a></li>`;
+  }).join('')}</ul>
+</section>
+${(() => { const f = readable(ch).find((s) => !S.data.heft[sectionKey(s)]) || readable(ch)[0]; return f ? `<a class="btn wide" href="#heft/${ch.c}/${ch.s.indexOf(f)}">${heftProgress(ch) ? 'Weiterlesen' : 'Kapitel starten'}</a>` : ''; })()}`;
+  }
+
+  function renderHeftSection(H, ch, i) {
+    const s = ch.s[i];
+    if (!s) return go(`#heft/${ch.c}`);
+    // nächster / vorheriger lesbarer Abschnitt (auch über Kapitelgrenzen)
+    const flat = H.flatMap((c) => c.s.map((x, j) => ({ c, x, j })).filter((o) => o.x.h.length > 40));
+    const pos = flat.findIndex((o) => o.c === ch && o.j === i);
+    const prev = flat[pos - 1], next = flat[pos + 1];
+    const parents = ch.s.filter((x, j) => j < i && x.h.length <= 40 && s.n.startsWith(`${x.n}.`)).map((x) => x.t);
+    view.innerHTML = `
+<a class="back" href="#heft/${ch.c}">‹ Kapitel ${ch.c}: ${esc(ch.t)}</a>
+<article class="card lesson heft-sec">
+  <p class="muted small">${parents.length ? esc(parents.join(' › ')) : `Kapitel ${ch.c}`}</p>
+  <h1><span class="snum-h">${s.n}</span> ${esc(s.t)}</h1>
+  ${isNeed(s.n) ? '<p><span class="need-tag">Need to know</span> <span class="muted small">Dieser Abschnitt wird am 1. Kurstag geprüft.</span></p>' : ''}
+  <div class="lesson-body">${s.h}</div>
+  <p class="pdf-link"><a href="${GUV_PDF}#page=${s.p}" target="_blank" rel="noopener">📄 Bilder & Original: PDF Seite ${s.p}</a></p>
+</article>
+<div class="row sticky-actions">
+  ${prev ? `<a class="btn ghost" href="#heft/${prev.c.c}/${prev.j}">‹ Zurück</a>` : ''}
+  <button class="btn" id="hNext">${next ? 'Gelesen, weiter ›' : 'Gelesen ✓'}</button>
+</div>
+<button class="link-btn" id="askCoach">💬 Frag den Coach zu diesem Abschnitt</button>`;
+    $('#hNext').addEventListener('click', () => {
+      if (!S.data.heft[sectionKey(s)]) { S.data.heft[sectionKey(s)] = true; S.addXp(3); S.save(); updateTop(); }
+      if (activeTask === 'lesson') { finishTask('lesson'); activeTask = null; }
+      go(next ? `#heft/${next.c.c}/${next.j}` : '#heft');
+    });
+    $('#askCoach').addEventListener('click', () => { coachPrefill = `Erklär mir den Abschnitt ${s.n} «${s.t}» aus Grundlagen & Verfahren ganz einfach, mit einem Beispiel.`; go('#coach'); });
   }
 
   // ---------- Checkliste lesen / abdecken ----------
@@ -696,7 +813,7 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
     if (cleanup) { try { cleanup(); } catch { /* ignorieren */ } cleanup = null; }
     view.onkeydown = null;
     const [page, a, b] = (location.hash.slice(1) || 'heute').split('/');
-    const tab = { heute: 'heute', lernen: 'lernen', thema: 'lernen', checkliste: 'lernen', lektion: 'lernen', quiz: 'lernen', training: 'training', simulation: 'training', coach: 'coach', profil: 'profil' }[page] || 'heute';
+    const tab = { heute: 'heute', lernen: 'lernen', thema: 'lernen', checkliste: 'lernen', heft: 'lernen', lektion: 'lernen', quiz: 'lernen', training: 'training', simulation: 'training', coach: 'coach', profil: 'profil' }[page] || 'heute';
     document.querySelectorAll('.tabs a').forEach((x) => x.classList.toggle('active', x.dataset.tab === tab));
     document.body.classList.toggle('in-chat', page === 'coach');
     if (!S.settings.onboarded) return renderWelcome();
@@ -708,6 +825,7 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
       case 'training': a ? renderTrainer(a) : renderTraining(); break;
       case 'simulation': renderSimulation(); break;
       case 'checkliste': renderCheckliste(); break;
+      case 'heft': renderHeft(a, b); break;
       case 'coach': renderCoach(); break;
       case 'profil': renderProfil(); break;
       default: renderHeute();

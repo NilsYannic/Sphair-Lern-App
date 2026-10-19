@@ -316,6 +316,143 @@
       ],
     },
     {
+      id: 'guv2', name: 'Heft: Kapitel 10–21', icon: '📕', color: '#b45309',
+      desc: 'Langsamflug, Notlandung, Navigation, Instrumentenflug, Luftraum, Funk – aus «Grundlagen & Verfahren»',
+      lessons: [
+        { t: 'Langsamflug, Stall, Trudeln (10)', b: `
+<ul>
+<li><b>V<sub>A</sub></b> (Manövergeschwindigkeit): höchste Geschwindigkeit für vollen Steuerausschlag ohne Überlastung. Nicht auf dem ASI markiert, sie nimmt mit abnehmender Masse ab.</li>
+<li><b>V<sub>S0</sub></b> = unteres Ende weisser Bogen, <b>V<sub>S1</sub></b> = unteres Ende grüner Bogen, <b>V<sub>NO</sub></b> = oberes Ende grün, <b>V<sub>FE</sub></b> = oberes Ende weiss, <b>V<sub>NE</sub></b> = rote Linie.</li>
+<li>Kategorien nach CS-23: <b>Normal</b> (bis 60° Querlage, kein Kunstflug), <b>Utility</b> (beschränkter Kunstflug, Trudeln falls zugelassen), <b>Acrobatic</b>.</li>
+<li>Lastvielfaches n = 1 / cos(Querlage). V<sub>S</sub> in der Kurve = V<sub>S</sub> × √n → bei 60°: 50 kt × 1.414 ≈ 71 kt.</li>
+<li><b>Langsamflug</b> = langsamer als V<sub>BEST GLIDE</sub>. Dort ist das Flugzeug <b>nicht geschwindigkeitsstabil</b>, darüber schon.</li>
+<li>Die Stall-Warnung kommt ca. <b>10 % über V<sub>S</sub></b> (5–10 kt).</li>
+<li>Stall ausleiten: <b>Nase senken</b> (das ist entscheidend!), Leistung zügig, aber nicht brüsk, Flügel mit Seitenruder gerade halten, nicht am Höhensteuer reissen (sonst <b>SECONDARY STALL</b>), danach Climb Check.</li>
+<li>Im Stall das <b>Querruder neutral</b> halten, sonst droht Trudeln.</li>
+<li><b>Spiralsturz:</b> Strömung liegt an, Geschwindigkeit steigt schnell → Leistung idle, Flügel gerade, vorsichtig abfangen.</li>
+<li><b>Trudeln:</b> Strömung abgelöst (Autorotation) → Leistung idle, Querruder neutral, Seitenruder voll gegen die Drehung, Höhenruder nach vorne (AFM beachten).</li>
+</ul>` },
+        { t: 'Erster Alleinflug (14)', b: `
+<ul>
+<li>Du bist jetzt <b>PIC</b>. Der Fluglehrer lässt dich nur fliegen, wenn er sicher ist, dass er nicht über Funk helfen muss.</li>
+<li>Das Flugzeug ist <b>leichter</b> (ohne Fluglehrer): Es steigt besser und schwebt bei der Landung länger aus.</li>
+<li>Bist du unsicher? <b>GO AROUND</b> und nochmals von vorne – es gibt keine Eile.</li>
+<li>Wetter: keine Niederschläge, kein starker Wind, keine Turbulenzen, Seitenwind nach Ausbildungsstand, keine Verschlechterung absehbar.</li>
+<li>Treibstoff: Flug + Reserve für Orbits, Go-arounds und den Flug zum Ausweichflugplatz (ALTN).</li>
+<li><b>ADM</b> (Aeronautical Decision Making): Der PIC entscheidet selbstständig auf Basis aller Fakten.</li>
+</ul>` },
+        { t: 'Steilkurven (15)', b: `
+<ul>
+<li><b>Steilkurve</b> = mehr als 30° Querlage (Key Words: mehr als 45°). Trainiert wird mit 45° oder 60° in CLEAN CONFIGURATION.</li>
+<li>Mit Leichtflugzeugen sind Kurven über <b>45°</b> instationär: Selbst mit voller Leistung lässt sich die Geschwindigkeit nicht halten.</li>
+<li>Bei Steilkurven auf <b>FULL POWER</b> erhöhen.</li>
+<li>Vorher die <b>Lufttüchtigkeitskategorie</b> und die Masse prüfen (AFM, Placard).</li>
+</ul>` },
+        { t: 'Notlandung ohne Motor (16)', b: `
+<ul>
+<li>Basis-Schulflugzeuge haben eine Gleitzahl von ca. <b>1:10</b>: Aus 1000 ft kommst du ca. 10'000 ft (≈ 3 km) weit. Segelflugzeuge schaffen 1:30 bis 1:60.</li>
+<li><b>V<sub>BEST GLIDE</sub></b> = weiteste Distanz, meist ungefähr V<sub>Y</sub>. <b>Auswendig wissen!</b> V<sub>BEST ENDURANCE</sub> = längste Zeit, ca. 15 % tiefer.</li>
+<li>Den Gleitflug unbedingt <b>austrimmen</b>.</li>
+<li>Die Sinkrate im Gleitflug ist etwa <b>doppelt</b> so gross wie im normalen Anflug. Für Kreise ist <b>45° Querlage</b> der beste Kompromiss.</li>
+<li><b>KEY POSITION</b>: querab der Schwelle, ca. <b>1000 ft</b> über Grund. Dort Klappen auf Stufe 1, weiter mit V<sub>BEST GLIDE</sub>.</li>
+<li>Gelände: am besten eine <b>gemähte Wiese</b>. Hohes Getreide meiden (Überschlaggefahr). Bei Gefälle <b>hangaufwärts</b> landen, auch mit leichtem Rückenwind.</li>
+<li>Wind am Boden erkennst du an Rauch, wogenden Feldern, Wellen auf dem Wasser. Kühe stehen mit dem Hinterteil im Wind.</li>
+<li>Schweiz: Im Mittelland Achtung auf Hochspannungsleitungen und Zäune, in den Alpen gibt es kaum Landemöglichkeiten.</li>
+<li>Vor dem Aufsetzen: Treibstoff zu, Zündung aus, Master aus (nach den Klappen), Türe entriegeln, Brille ab, <b>BRACE</b>-Position.</li>
+<li>Funk: <b>MAYDAY</b> (3×), Transponder <b>7700</b>.</li>
+</ul>` },
+        { t: 'Vorsorgliche Landung (17)', b: `
+<ul>
+<li>Gründe: Orientierungsverlust, Wetterverschlechterung, einbrechende Nacht, Treibstoffmangel, technisches Problem, Unwohlsein.</li>
+<li>In der Schweiz ist im Mittelland meist innert <b>5–10 Minuten</b> ein Flugplatz erreichbar – zuerst daran denken!</li>
+<li>Gelände immer <b>tief und seitlich versetzt überfliegen</b> (Low Flying Check), z.&nbsp;B. 500 ft und 200 ft AGL. <b>«Sicht geht vor Höhe»</b>.</li>
+<li>Früh die <b>PRECAUTIONARY CONFIGURATION</b> setzen (Klappen, reduzierte Geschwindigkeit): kleinere Kurvenradien, tiefere V<sub>STALL</sub>, bessere Sicht.</li>
+<li>Absicht über Funk melden (Kennzeichen, Position, Absicht), notfalls über ein anderes Flugzeug als <b>Relais</b>.</li>
+<li>Trainingsminima: Wolken über 1000 ft, Sicht über 3 km, mehr als 60 min bis zur Dämmerung.</li>
+</ul>` },
+        { t: 'Navigation & Notlagen im Reiseflug (18)', b: `
+<ul>
+<li><b>Pilotage</b> = nach Geländemerkmalen. <b>Koppelnavigation (DR)</b> = Kurs, Zeit, Geschwindigkeit und Wind berechnen – die Grundlage aller Navigation.</li>
+<li>Flugvorbereitung: Karten, NOTAM, DABS, Wetter (METAR, TAF, SIGMET, GAFOR), Navigationsflugplan (Steuerkurse, Zeiten, Treibstoff), Masse & Schwerpunkt, Leistung, ALTN.</li>
+<li><b>Funkausfall:</b> Transponder <b>7600</b>, weiter nach Flugplan, Anflug zur ETA beginnen, auf Licht- und Sichtzeichen achten.</li>
+<li><b>Orientierungsverlust:</b> nicht ins Unbekannte weiterfliegen. Umkehrkurs zur letzten bekannten Position, oder ATC sofort ehrlich sagen, dass du deine Position nicht kennst (ev. höher steigen für besseren Funk). Sonst früh genug vorsorglich landen.</li>
+<li><b>Vereisung:</b> «LOOK TWICE FOR ICE». Bei unbeabsichtigtem Einflug: 180°-Kurve, Vollgas, Vergaservorwärmung, Pitot Heat und Cabin Heat ein.</li>
+<li>Radionavigation: <b>QDM</b> = magnetischer Kurs <i>zur</i> Station, <b>QDR</b> = magnetisches Radial <i>von</i> der Station.</li>
+</ul>` },
+        { t: 'Instrumentenflug (19)', b: `
+<ul>
+<li>Ziel der Basisausbildung: z.&nbsp;B. eine <b>180°-Umkehrkurve</b> ohne natürlichen Horizont fliegen können.</li>
+<li>Nie auf das innere <b>Lagegefühl</b> verlassen – das Gleichgewichtsorgan wird durch Scheinkräfte getäuscht (VERTIGO).</li>
+<li><b>Control Instruments:</b> AI (Lage) und Leistungsanzeige (RPM/MP). <b>Performance Instruments:</b> ASI, ALT, VSI, DG, T/C.</li>
+<li><b>Attitude Flying</b> = bewusste Kombination aus Lage, Leistung und Konfiguration.</li>
+<li><b>Scanning:</b> Abfrageschlaufen, die immer zum <b>AI</b> zurückkehren (Selective Radial Scan).</li>
+<li><b>Partial Panel</b>: Fluglage halten ohne AI, mit den übrigen Anzeigen.</li>
+</ul>` },
+        { t: 'Luftraum Schweiz (20)', b: `
+<ul>
+<li>Die FIR Schweiz ist in die Kontrollbezirke <b>Zürich und Genf</b> geteilt (Trennlinie westlich von Bern).</li>
+<li><b>CTR</b> = Kontrollzone um den Flugplatz (ab Boden), <b>TMA</b> = Nahkontrollbezirk für An- und Abflüge, <b>AWY</b> = Luftstrasse (z.&nbsp;B. A9 Zürich–Mailand).</li>
+<li>Militärische CTR/TMA sind nur zu bestimmten Zeiten aktiv (HX), <b>Payerne</b> kann jederzeit aktiv sein. Aktuelle Infos im <b>DABS</b> (publiziert um 09:00, 13:00 und 16:00 LT).</li>
+<li><b>VMC:</b> Wolkenabstand <b>1000 ft vertikal, 1.5 km horizontal</b>. Sicht <b>5 km</b> unter FL100, <b>8 km</b> darüber. In Klasse G bis 1.5 km Sicht möglich (mit Bedingungen).</li>
+<li><b>Transponderpflicht:</b> in C und D, in E über 7000 ft AMSL, nachts überall. Standard-Code <b>7000</b>.</li>
+<li><b>Special VFR</b> in der CTR: frei von Wolken mit Bodensicht, mindestens 1.5 km Sicht, max. 140 kt, Wolkenbasis ab 600 ft AGL.</li>
+<li>Nacht-VFR: 8 km Sicht, Wolkenabstand 1.5 km / 1000 ft.</li>
+</ul>` },
+        { t: 'Kommunikation (21)', b: `
+<ul>
+<li>Sprache im internationalen Funk: <b>Englisch</b> (regional zusätzlich die Landessprache).</li>
+<li>Höchstens ca. <b>100 Wörter pro Minute</b>. Vor dem Senden zuhören, ob die Frequenz frei ist. Nach einem erfolglosen Anruf <b>10 Sekunden</b> warten.</li>
+<li>Taste ganz drücken, bevor du sprichst, erst nach der Meldung loslassen.</li>
+<li>Bodenstationen: <b>Ground</b> (Bodenverkehr), <b>Tower</b> (Platzverkehr), <b>Apron</b> (Vorfeld), <b>Information</b> (FIS/AFIS), <b>Approach/Arrival/Departure</b>, <b>Delivery</b> (Freigaben).</li>
+<li>Rufzeichen abkürzen: erstes Zeichen + mindestens die letzten zwei: <b>HB-KGF → H-GF</b>. Mit Flugnummer (SWISS 014) nicht abkürzbar.</li>
+<li>Wichtige Wörter: AFFIRM (ja), NEGATIVE, ROGER, WILCO, CONFIRM, CORRECTION, STANDBY, SAY AGAIN, CLEARED, CONTACT.</li>
+</ul>` },
+      ],
+      questions: [
+        { q: 'Was ist V_A?', a: ['Höchste Geschwindigkeit für vollen Steuerausschlag ohne Überlastung', 'Abhebegeschwindigkeit', 'Anfluggeschwindigkeit', 'Höchstgeschwindigkeit mit Klappen'], c: 0, e: 'Manoeuvering Speed – nicht auf dem ASI markiert, sie nimmt mit der Masse ab (GuV 10.1.1).' },
+        { q: 'Wie verändert sich V_A, wenn das Flugzeug leichter ist?', a: ['Sie wird kleiner', 'Sie wird grösser', 'Sie bleibt gleich', 'Sie fällt weg'], c: 0, e: 'GuV 10.1.1.' },
+        { q: 'Was markiert das untere Ende des grünen Bogens?', a: ['V_S1', 'V_S0', 'V_NO', 'V_FE'], c: 0, e: 'V_S1 (Stall clean, max. Startmasse). Weisser Bogen unten = V_S0.' },
+        { q: 'V_S ist 50 kt. Wie gross ist V_S in einer 60°-Kurve ungefähr?', a: ['71 kt', '50 kt', '100 kt', '58 kt'], c: 0, e: 'n = 2 → 50 × √2 ≈ 70.7 kt (GuV 10.1.6).' },
+        { q: 'Unter welcher Geschwindigkeit ist ein Flugzeug nicht mehr geschwindigkeitsstabil?', a: ['Unter V_BEST GLIDE', 'Unter V_NE', 'Unter V_NO', 'Unter V_FE'], c: 0, e: 'Unter V_BEST GLIDE steigt der induzierte Widerstand, die Geschwindigkeit baut sich nicht selbst wieder auf.' },
+        { q: 'Wann spricht die Stall-Warnung normalerweise an?', a: ['Ca. 10 % über V_S', 'Genau bei V_S', 'Erst nach dem Stall', '50 % über V_S'], c: 0, e: '5–10 kt vorher (GuV 10.3.3).' },
+        { q: 'Was ist beim Ausleiten eines Stalls entscheidend?', a: ['Die Lageänderung (Nase senken)', 'Die Leistungserhöhung', 'Die Klappen', 'Der Funkspruch'], c: 0, e: 'Der Lagewechsel, nicht die Leistung, stellt den normalen Flugzustand wieder her (GuV 10.3.7).' },
+        { q: 'Wie heisst ein erneuter Stall durch zu starkes Ziehen beim Abfangen?', a: ['Secondary Stall', 'Deep Stall', 'Spiral Dive', 'Ballooning'], c: 0, e: 'GuV 10.3.6.' },
+        { q: 'Was tust du im Stall mit dem Querruder?', a: ['Neutral halten', 'Voll gegen das Abkippen', 'Voll in Kurvenrichtung', 'Schnell hin und her'], c: 0, e: 'Querruder im Stall kann die Strömung ganz ablösen → Trudelgefahr (GuV 10.3.8).' },
+        { q: 'Was unterscheidet einen Spiralsturz vom Trudeln?', a: ['Beim Spiralsturz liegt die Strömung an, die Geschwindigkeit steigt', 'Beim Spiralsturz ist die Strömung abgelöst', 'Es gibt keinen Unterschied', 'Trudeln ist schneller'], c: 0, e: 'Trudeln = Autorotation im Stall, Spiralsturz = steile Abwärtskurve mit hoher Geschwindigkeit (GuV 10.4.2).' },
+        { q: 'Beim Trudeln: Was machst du mit dem Seitenruder?', a: ['Voll gegen die Drehung', 'Voll mit der Drehung', 'Neutral', 'Gar nichts'], c: 0, e: 'Leistung idle, Querruder neutral, Seitenruder voll gegen die Drehung, Höhenruder nach vorne (sofern AFM nichts anderes sagt).' },
+        { q: 'In welcher Kategorie sind Steilkurven über 60° erlaubt?', a: ['Utility (und Acrobatic)', 'Nur Normal', 'In keiner', 'Nur mit Fluglehrer in Normal'], c: 0, e: 'Normal: bis 60°. Utility: beschränkter Kunstflug mit Steilkurven über 60° (GuV 10.1.2).' },
+        { q: 'Was ändert sich beim ersten Alleinflug am Flugzeug?', a: ['Es ist leichter: steigt besser, schwebt länger', 'Es ist schwerer', 'Es fliegt langsamer', 'Nichts'], c: 0, e: 'Ohne Fluglehrer fehlt dessen Gewicht (GuV 14.0.1).' },
+        { q: 'Du fühlst dich beim Alleinflug im Anflug unsicher. Was tust du?', a: ['Go-around und nochmals von vorne', 'Trotzdem landen', 'Den Fluglehrer anrufen', 'Den Motor abstellen'], c: 0, e: '«Es gibt keine Eile» (GuV 14.0.1).' },
+        { q: 'Was bedeutet ADM?', a: ['Aeronautical Decision Making', 'Airport Data Message', 'Altitude Display Mode', 'Air Defence Mission'], c: 0, e: 'Eigenständige, luftfahrtbezogene Entscheidungsfindung des PIC.' },
+        { q: 'Ab wie viel Grad Querlage sind Kurven mit Leichtflugzeugen instationär?', a: ['Über 45°', 'Über 15°', 'Über 90°', 'Nie'], c: 0, e: 'Selbst mit voller Leistung lässt sich die Geschwindigkeit nicht halten (GuV 15.2.1).' },
+        { q: 'Gleitzahl 1:10, Höhe 2000 ft über Grund. Wie weit kommst du ungefähr?', a: ['20\'000 ft (≈ 6 km)', '2000 ft', '10 km', '1 km'], c: 0, e: '2000 × 10 = 20\'000 ft ≈ 6.1 km.' },
+        { q: 'Welche Geschwindigkeit gibt die weiteste Gleitstrecke?', a: ['V_BEST GLIDE', 'V_BEST ENDURANCE', 'V_NE', 'V_S0'], c: 0, e: 'V_BEST ENDURANCE gibt die längste Zeit (ca. 15 % tiefer).' },
+        { q: 'Mit welcher Querlage verlierst du pro Vollkreis im Gleitflug am wenigsten Höhe?', a: ['45°', '15°', '60°', '5°'], c: 0, e: 'Bester Kompromiss zwischen Drehgeschwindigkeit und Sinkrate (GuV 16.1.4).' },
+        { q: 'Auf welcher Höhe sollte die KEY POSITION bei einer Notlandung ungefähr sein?', a: ['Ca. 1000 ft über Grund', 'Ca. 100 ft', 'Ca. 5000 ft', 'Egal'], c: 0, e: 'Querab der Schwelle, ca. 1000 ft GND (GuV 16.2.2).' },
+        { q: 'Welches Feld ist für eine Notlandung am besten?', a: ['Gemähte Wiese', 'Hohes Getreidefeld', 'Frisch gepflügter Acker', 'Wald'], c: 0, e: 'Hoher Bewuchs → Überschlaggefahr (GuV 16.4.3).' },
+        { q: 'Notlandung auf einem geneigten Feld:', a: ['Hangaufwärts landen, auch mit leichtem Rückenwind', 'Immer hangabwärts', 'Quer zum Hang', 'Gegen den Wind hangabwärts'], c: 0, e: 'GuV 16.4.3 und 16.5.1.' },
+        { q: 'Woran erkennst du die Windrichtung am Boden?', a: ['Rauchfahnen, wogende Felder, Wellen auf dem Wasser', 'Am Kompass', 'An der Sonne', 'Gar nicht'], c: 0, e: 'Auch Kühe stehen meist mit dem Hinterteil im Wind (GuV 16.5.1).' },
+        { q: 'Was gehört kurz vor dem Aufsetzen einer Notlandung dazu?', a: ['Treibstoff zu, Zündung aus, Türe entriegeln, Brille ab', 'Vollgas geben', 'Klappen einfahren', 'Transponder aus'], c: 0, e: 'Plus BRACE-Position für die Passagiere (GuV 16.5.3).' },
+        { q: 'Wie überprüfst du ein Feld vor einer vorsorglichen Landung?', a: ['Tief und seitlich versetzt überfliegen', 'Direkt hineinlanden', 'Von 5000 ft beurteilen', 'Gar nicht'], c: 0, e: 'Low Flying Check, «Sicht geht vor Höhe» (GuV 17.2.2).' },
+        { q: 'Was bringt die PRECAUTIONARY CONFIGURATION?', a: ['Kleinere Kurvenradien, tiefere V_STALL, bessere Sicht', 'Mehr Geschwindigkeit', 'Weniger Treibstoffverbrauch', 'Besseren Funk'], c: 0, e: 'Klappen ausgefahren, reduzierte Geschwindigkeit (GuV 17.3.1).' },
+        { q: 'Was tust du zuerst bei einem Funkausfall?', a: ['Transponder 7600 setzen', 'Transponder 7700', 'Sofort landen', 'Den Tower anrufen'], c: 0, e: 'Danach weiter nach Flugplan, Anflug zur ETA, auf Lichtzeichen achten (GuV 18.7.1).' },
+        { q: 'Du hast die Orientierung verloren. Was ist richtig?', a: ['ATC ehrlich sagen, dass du die Position nicht kennst', 'Weiterfliegen und hoffen', 'Tiefer sinken', 'Funk ausschalten'], c: 0, e: 'Oder Umkehrkurs zur letzten bekannten Position, rechtzeitig vorsorglich landen (GuV 18.7.2).' },
+        { q: 'Was bedeutet ein QDM von 315?', a: ['Magnetischer Kurs 315° zur Station', 'Radial 315 von der Station', 'Höhe 315 ft', 'Distanz 315 NM'], c: 0, e: 'QDM = magnetischer Kurs zur Station, QDR = von der Station weg.' },
+        { q: 'Unbeabsichtigt in Vereisung: Was gehört zum Verfahren (Beispiel AFM)?', a: ['180°-Kurve, Vollgas, Vergaservorwärmung, Pitot Heat ein', 'Weiter steigen', 'Leistung reduzieren', 'Klappen voll ausfahren'], c: 0, e: '«LOOK TWICE FOR ICE» (GuV 18.7.5).' },
+        { q: 'Was sind die «Control Instruments» im Instrumentenflug?', a: ['AI und Leistungsanzeige', 'ASI und ALT', 'VSI und DG', 'Kompass und Uhr'], c: 0, e: 'Die Performance Instruments zeigen das Resultat (GuV 19.2.6).' },
+        { q: 'Wohin kehrt der Blick beim Instrumenten-Scanning immer zurück?', a: ['Zum AI', 'Zum Kompass', 'Zur Uhr', 'Zum Funkgerät'], c: 0, e: 'Selective Radial Scan um den Attitude Indicator.' },
+        { q: 'Welche Mindestsicht gilt für VFR unter FL100 (ausser Klasse G)?', a: ['5 km', '1.5 km', '8 km', '10 km'], c: 0, e: 'Über FL100: 8 km (GuV 20.2.4).' },
+        { q: 'Welcher Wolkenabstand gilt grundsätzlich für VFR?', a: ['1000 ft vertikal, 1.5 km horizontal', '500 ft und 1 km', 'Frei von Wolken', '3000 ft und 5 km'], c: 0, e: 'GuV 20.2.4.' },
+        { q: 'Wann wird das DABS für den aktuellen Tag publiziert?', a: ['09:00, 13:00 und 16:00 LT', 'Nur um Mitternacht', 'Jede Stunde', 'Nur auf Anfrage'], c: 0, e: 'Das für den Folgetag um 16:00 LT (GuV 20.3).' },
+        { q: 'Welches Militärgebiet kann jederzeit aktiv sein?', a: ['CTR/TMA Payerne', 'CTR Zürich', 'TMA Genf', 'Keines'], c: 0, e: 'GuV 20.1.4.' },
+        { q: 'Wo gilt Transponderpflicht?', a: ['In C und D, in E über 7000 ft AMSL, nachts überall', 'Nur in G', 'Nur über FL195', 'Nirgends für VFR'], c: 0, e: 'GuV 20.2.4.' },
+        { q: 'Was ist die Mindestsicht bei Special VFR in einer CTR?', a: ['1.5 km', '5 km', '500 m', '8 km'], c: 0, e: 'Plus frei von Wolken, Bodensicht, max. 140 kt, Wolkenbasis ab 600 ft AGL.' },
+        { q: 'Wie lange wartest du nach einem erfolglosen Funkanruf?', a: ['10 Sekunden', '1 Sekunde', '1 Minute', '5 Minuten'], c: 0, e: 'GuV 21.1.2.' },
+        { q: 'Wie kürzt man das Rufzeichen HB-KGF ab?', a: ['H-GF', 'KGF', 'HB-K', 'GF'], c: 0, e: 'Erstes Zeichen + mindestens die zwei letzten Buchstaben (GuV 21.1.7).' },
+        { q: 'Welche Stelle ist für den Bodenverkehr auf dem Rollweg zuständig?', a: ['Ground', 'Tower', 'Approach', 'Delivery'], c: 0, e: 'Tower = Platzverkehr, Apron = Vorfeld, Delivery = Freigaben.' },
+      ],
+    },
+    {
       id: 'aero', name: 'Aerodynamik', icon: '🪽', color: '#0ea5e9',
       desc: 'Warum ein Flugzeug fliegt: Kräfte, Auftrieb, Steuerung',
       lessons: [

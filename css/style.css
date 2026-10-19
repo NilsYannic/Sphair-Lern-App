@@ -334,3 +334,35 @@ button, input, select, textarea { font-family: var(--font); }
 .cl li span { flex: 1; }
 .clv { text-align: right; font-weight: 700; color: var(--accent); }
 #clList.hide .clv:not(.show) { color: transparent; background: var(--line); border-radius: 6px; min-width: 90px; cursor: pointer; user-select: none; }
+
+/* Das Heft */
+.need-tag { display: inline-block; font: 700 .68rem/1 var(--font); letter-spacing: .04em; text-transform: uppercase; color: var(--flame); background: color-mix(in srgb, var(--flame) 14%, transparent); padding: 3px 7px; border-radius: 6px; vertical-align: middle; }
+.heft-card { background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, var(--card)), var(--card)); }
+.chapters { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.chapters .card { margin: 0; }
+.chap { display: flex !important; align-items: center; gap: 12px; }
+.chap .bar { display: block; margin: 8px 0 0; height: 5px; }
+.cnum { width: 40px; height: 40px; flex: none; border-radius: 12px; display: grid; place-items: center; font-weight: 800; background: var(--accent-soft); color: var(--accent); font-variant-numeric: tabular-nums; }
+.search input { width: 100%; font: 1rem var(--font); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--text); margin-top: 8px; }
+.search input:focus { outline: none; border-color: var(--accent); }
+.hits { list-style: none; padding: 0; margin: 6px 0 0; }
+.hits a { display: block; padding: 10px 0; border-top: 1px solid var(--line); color: inherit; }
+.hits b { display: block; font-size: .92rem; }
+.hits small { color: var(--muted); }
+.sec-list .sec-head { font: 700 .74rem/1.3 var(--font); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); padding: 16px 4px 4px; }
+.sec-list .task.d4, .sec-list .task.d5 { padding-left: 18px; }
+.snum { min-width: 46px; height: 30px; padding: 0 6px; border-radius: 9px; display: grid; place-items: center; font: 700 .78rem var(--font); background: var(--bg); color: var(--muted); font-variant-numeric: tabular-nums; }
+.task.done .snum { background: var(--good-soft); color: var(--good); }
+.sec-list .tt b { font-size: .9rem; font-weight: 600; }
+.heft-sec h1 { font-size: 1.25rem; letter-spacing: 0; }
+.snum-h { color: var(--accent); margin-right: 4px; }
+.heft-sec .lesson-body { font-size: .98rem; }
+.heft-sec .lesson-body p { margin: .6em 0; }
+.proc { display: flex; justify-content: space-between; gap: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .86rem; background: var(--bg); padding: 6px 10px; border-radius: 8px; margin: 4px 0 !important; }
+.proc b { text-align: right; color: var(--accent); }
+.pdf-link { margin-top: 18px; font-weight: 600; font-size: .92rem; }
+.fig { color: var(--muted); font-style: italic; font-size: .88rem; }
+.chapters li { min-width: 0; }
+.chap { min-width: 0; }
+.chap .tt small { white-space: normal; }
+.chap .tt b { overflow-wrap: anywhere; }

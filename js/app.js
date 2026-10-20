@@ -427,6 +427,7 @@ ${!untimed && item.time ? '<div class="bar timer"><i id="tBar"></i></div>' : ''}
     view.innerHTML = `
 <a class="back" href="#lernen">‹ Lernen</a>
 <section class="hero"><h1>Das Heft</h1><p class="muted">«Grundlagen und Verfahren» 2026 – das offizielle SPHAIR-Lehrbuch für den Flugkurs, komplett. <span class="need-tag">Need to know</span> = wird am 1. Kurstag geprüft.</p></section>
+<a class="card review heft-card" href="#seite"><span class="ticon">📄</span><span class="tt"><b>Originalseiten blättern</b><small>Alle 566 Seiten genau wie im gedruckten Heft – mit Bildern</small></span><span class="chev">›</span></a>
 <section class="card">
   <div class="card-head"><h2>Dein Fortschritt</h2><span class="muted">${done}/${total} Abschnitte</span></div>
   <div class="bar"><i style="width:${total ? (done / total) * 100 : 0}%"></i></div>
@@ -435,7 +436,7 @@ ${!untimed && item.time ? '<div class="bar timer"><i id="tBar"></i></div>' : ''}
 </section>
 <ul class="chapters">${H.map((c) => { const p = heftProgress(c); const need = c.s.some((s) => isNeed(s.n)); return `<li><a class="card chap" href="#heft/${c.c}">
   <span class="cnum">${c.c}</span><span class="tt"><b>${esc(c.t)}</b><small>${esc(c.en)}${need ? ' · <span class="need-tag">Need to know</span>' : ''}</small><span class="bar"><i style="width:${p}%"></i></span></span><span class="chev">›</span></a></li>`; }).join('')}</ul>
-<p class="note">© 2026 Schweizerische Eidgenossenschaft, vertreten durch die Luftwaffe. Text aus dem PDF übernommen; Bilder und Zeichnungen findest du über «Seite im PDF» in jedem Abschnitt. <a href="${GUV_PDF}" target="_blank" rel="noopener">Original-PDF öffnen</a></p>`;
+<p class="note">© 2026 Schweizerische Eidgenossenschaft, vertreten durch die Luftwaffe. Text aus dem PDF übernommen; Bilder und Zeichnungen findest du unter «Originalseiten blättern». <a href="${GUV_PDF}" target="_blank" rel="noopener">Original-PDF öffnen</a></p>`;
     const res = $('#hRes');
     const search = () => {
       const q = normTxt($('#hq').value.trim());
@@ -457,7 +458,7 @@ ${!untimed && item.time ? '<div class="bar timer"><i id="tBar"></i></div>' : ''}
   function renderHeftChapter(ch) {
     view.innerHTML = `
 <a class="back" href="#heft">‹ Das Heft</a>
-<section class="hero"><p class="muted">Kapitel ${ch.c} · ${esc(ch.en)}</p><h1>${esc(ch.t)}</h1></section>
+<section class="hero"><p class="muted">Kapitel ${ch.c} · ${esc(ch.en)}</p><h1>${esc(ch.t)}</h1><a class="btn ghost" href="#seite/${(GUV_CH.find((x) => x[0] === ch.c) || [0, ch.p])[1]}">📄 Kapitel als Originalseiten</a></section>
 <section class="card">
   <div class="card-head"><h2>Abschnitte</h2><span class="muted">${heftProgress(ch)} % gelesen</span></div>
   <ul class="tasks sec-list">${ch.s.map((s, i) => {
@@ -485,7 +486,7 @@ ${(() => { const f = readable(ch).find((s) => !S.data.heft[sectionKey(s)]) || re
   <h1><span class="snum-h">${s.n}</span> ${esc(s.t)}</h1>
   ${isNeed(s.n) ? '<p><span class="need-tag">Need to know</span> <span class="muted small">Dieser Abschnitt wird am 1. Kurstag geprüft.</span></p>' : ''}
   <div class="lesson-body">${s.h}</div>
-  <p class="pdf-link"><a href="${GUV_PDF}#page=${s.p}" target="_blank" rel="noopener">📄 Bilder & Original: PDF Seite ${s.p}</a></p>
+  <p class="pdf-link"><a href="#seite/${s.p}">📄 Originalseite ${s.p} ansehen (mit Bildern)</a></p>
 </article>
 <div class="row sticky-actions">
   ${prev ? `<a class="btn ghost" href="#heft/${prev.c.c}/${prev.j}">‹ Zurück</a>` : ''}
@@ -498,6 +499,55 @@ ${(() => { const f = readable(ch).find((s) => !S.data.heft[sectionKey(s)]) || re
       go(next ? `#heft/${next.c.c}/${next.j}` : '#heft');
     });
     $('#askCoach').addEventListener('click', () => { coachPrefill = `Erklär mir den Abschnitt ${s.n} «${s.t}» aus Grundlagen & Verfahren ganz einfach, mit einem Beispiel.`; go('#coach'); });
+  }
+
+  // ---------- Originalseiten des Hefts (Bilder, Seite für Seite) ----------
+  const GUV_PAGES = 566;
+  const GUV_CH = [[0, 1, 'Einführung'], [1, 21, 'Vertraut werden mit dem Flugzeug'], [2, 43, 'Vorbereitung und Abschluss eines Fluges'], [3, 75, 'Angewöhnungsflug'], [4, 97, 'Wirkung der Steuer'], [5, 133, 'Rollen'], [6, 159, 'Horizontaler Geradeausflug'], [7, 173, 'Steigen'], [8, 191, 'Absinken'], [9, 211, 'Kurven'], [10, 225, 'Langsamflug und Strömungsabriss'], [11, 253, 'Abnormale Situationen'], [12, 277, 'Start und Steigflug bis zum Gegenanflug'], [13, 309, 'Platzverkehr, Anflug, Landung'], [14, 361, 'Erster Alleinflug'], [15, 373, 'Kurven mit erhöhten Anforderungen'], [16, 383, 'Notlandung ohne Triebwerkleistung'], [17, 405, 'Vorsorgliche Landung'], [18, 415, 'Navigation'], [19, 495, 'Einführung in den Instrumentenflug'], [20, 517, 'Luftraum'], [21, 535, 'Kommunikation']];
+  const sheetOf = (p) => `guv/s${String(Math.ceil(p / 2)).padStart(3, '0')}.webp`;
+  const chapterOfPage = (p) => [...GUV_CH].reverse().find((c) => p >= c[1]);
+
+  function renderSeite(n) {
+    let last = 1;
+    try { last = Number(localStorage.getItem('guvPage')) || 1; } catch { /* egal */ }
+    const p = Math.min(GUV_PAGES, Math.max(1, Number(n) || last));
+    try { localStorage.setItem('guvPage', p); } catch { /* egal */ }
+    const ch = chapterOfPage(p);
+    view.innerHTML = `
+<a class="back" href="#heft">‹ Das Heft</a>
+<div class="pv-bar">
+  <select id="pvCh" aria-label="Kapitel">${GUV_CH.map((c) => `<option value="${c[1]}" ${c === ch ? 'selected' : ''}>${c[0]} · ${esc(c[2])}</option>`).join('')}</select>
+  <button class="btn ghost small-btn" id="pvZoom" aria-pressed="false">🔍 Zoom</button>
+</div>
+<div class="pv-scroll" id="pvScroll"><div class="pv-page" id="pvPage"><img id="pvImg" src="${sheetOf(p)}" alt="Originalseite ${p} von Grundlagen und Verfahren" class="${p % 2 ? 'top' : 'bottom'}"></div></div>
+<div class="pv-nav">
+  <button class="btn ghost" id="pvPrev" ${p <= 1 ? 'disabled' : ''}>‹</button>
+  <form id="pvGo" class="pv-go"><input id="pvNum" inputmode="numeric" value="${p}" aria-label="Seite"><span class="muted">/ ${GUV_PAGES}</span></form>
+  <button class="btn ghost" id="pvNext" ${p >= GUV_PAGES ? 'disabled' : ''}>›</button>
+</div>
+<p class="note">Originalseiten © 2026 Schweizerische Eidgenossenschaft, vertreten durch die Luftwaffe – SPHAIR Grundlagen & Verfahren 2026. Tipp: Wischen zum Blättern.</p>`;
+    // nächste Seiten vorladen
+    [p + 1, p + 2].filter((x) => x <= GUV_PAGES).forEach((x) => { const i = new Image(); i.src = sheetOf(x); });
+    const to = (x) => go(`#seite/${Math.min(GUV_PAGES, Math.max(1, x))}`);
+    $('#pvPrev').addEventListener('click', () => to(p - 1));
+    $('#pvNext').addEventListener('click', () => to(p + 1));
+    $('#pvCh').addEventListener('change', (e) => to(Number(e.target.value)));
+    $('#pvGo').addEventListener('submit', (e) => { e.preventDefault(); to(Number($('#pvNum').value)); });
+    $('#pvZoom').addEventListener('click', (e) => {
+      const on = $('#pvScroll').classList.toggle('zoom');
+      e.currentTarget.setAttribute('aria-pressed', on);
+    });
+    let sx = null, sy = 0;
+    const box = $('#pvScroll');
+    box.addEventListener('touchstart', (e) => { if (e.touches.length === 1) { sx = e.touches[0].clientX; sy = e.touches[0].clientY; } }, { passive: true });
+    box.addEventListener('touchend', (e) => {
+      if (sx == null || box.classList.contains('zoom')) return;
+      const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+      sx = null;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) to(dx < 0 ? p + 1 : p - 1);
+    });
+    view.onkeydown = null;
+    cleanup = (() => { const k = (e) => { if (e.target.tagName === 'INPUT') return; if (e.key === 'ArrowRight') to(p + 1); if (e.key === 'ArrowLeft') to(p - 1); }; window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k); })();
   }
 
   // ---------- Checkliste lesen / abdecken ----------
@@ -813,7 +863,7 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
     if (cleanup) { try { cleanup(); } catch { /* ignorieren */ } cleanup = null; }
     view.onkeydown = null;
     const [page, a, b] = (location.hash.slice(1) || 'heute').split('/');
-    const tab = { heute: 'heute', lernen: 'lernen', thema: 'lernen', checkliste: 'lernen', heft: 'lernen', lektion: 'lernen', quiz: 'lernen', training: 'training', simulation: 'training', coach: 'coach', profil: 'profil' }[page] || 'heute';
+    const tab = { heute: 'heute', lernen: 'lernen', thema: 'lernen', checkliste: 'lernen', heft: 'lernen', seite: 'lernen', lektion: 'lernen', quiz: 'lernen', training: 'training', simulation: 'training', coach: 'coach', profil: 'profil' }[page] || 'heute';
     document.querySelectorAll('.tabs a').forEach((x) => x.classList.toggle('active', x.dataset.tab === tab));
     document.body.classList.toggle('in-chat', page === 'coach');
     if (!S.settings.onboarded) return renderWelcome();
@@ -826,6 +876,7 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
       case 'simulation': renderSimulation(); break;
       case 'checkliste': renderCheckliste(); break;
       case 'heft': renderHeft(a, b); break;
+      case 'seite': renderSeite(a); break;
       case 'coach': renderCoach(); break;
       case 'profil': renderProfil(); break;
       default: renderHeute();

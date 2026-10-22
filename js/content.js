@@ -551,7 +551,7 @@
 <ul>
 <li><b>Doppelzündung</b> mit zwei Magneten, unabhängig von der Batterie (Magnetcheck vor dem Start).</li>
 <li><b>Gemisch</b> in der Höhe abmagern (die Luft ist dünner).</li>
-<li><b>Vergaservereisung:</b> möglich bis ca. +25 °C bei feuchter Luft. Zeichen: Drehzahl sinkt. Abhilfe: <b>Vergaservorwärmung</b> (Drehzahl sinkt erst noch etwas, dann steigt sie).</li>
+<li><b>Vergaservereisung:</b> möglich bei feuchter Luft von 0 bis ca. +20 °C (vereinzelt auch höher). Zeichen: Drehzahl sinkt. Abhilfe: <b>Vergaservorwärmung</b> (Drehzahl sinkt erst noch etwas, dann steigt sie).</li>
 <li>Treibstoff <b>AVGAS 100LL</b> (blau). Vor dem Flug Probe ziehen: Wasser?</li>
 </ul>` },
         { t: 'Masse, Schwerpunkt, Leistung', b: `

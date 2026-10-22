@@ -169,6 +169,7 @@ ${daysLeft != null ? `<section class="card countdown"><div><b>${daysLeft > 0 ? d
     view.innerHTML = `
 <section class="hero"><h1>Lernen</h1><p class="muted">Die Theorie für Flugkurs und Airline-Weg. Lies die Lektionen, dann festigt das Quiz dein Wissen.</p></section>
 <a class="card review heft-card" href="#heft"><span class="ticon">📕</span><span class="tt"><b>Das Heft: Grundlagen & Verfahren</b><small>Das komplette offizielle SPHAIR-Lehrbuch · ${Object.keys(S.data.heft).length} Abschnitte gelesen</small></span><span class="chev">›</span></a>
+<a class="card review" href="#kf"><span class="ticon">🗂️</span><span class="tt"><b>Kontrollfragen aus dem Heft</b><small>${(window.KONTROLLFRAGEN || []).length} Lernkarten mit Lösungen</small></span><span class="chev">›</span></a>
 <a class="card review" href="#checkliste"><span class="ticon">📋</span><span class="tt"><b>Checkliste deiner Flugschule</b><small>${esc(T.checklistOf().key)} – offizielle SPHAIR-Checkliste</small></span><span class="chev">›</span></a>
 <a class="card review" href="#quiz/all"><span class="ticon">🔁</span><span class="tt"><b>Fällige Karten wiederholen</b><small>${dueAll().length} Fragen sind heute dran</small></span><span class="chev">›</span></a>
 <div class="grid">
@@ -458,7 +459,7 @@ ${!untimed && item.time ? '<div class="bar timer"><i id="tBar"></i></div>' : ''}
   function renderHeftChapter(ch) {
     view.innerHTML = `
 <a class="back" href="#heft">‹ Das Heft</a>
-<section class="hero"><p class="muted">Kapitel ${ch.c} · ${esc(ch.en)}</p><h1>${esc(ch.t)}</h1><a class="btn ghost" href="#seite/${(GUV_CH.find((x) => x[0] === ch.c) || [0, ch.p])[1]}">📄 Kapitel als Originalseiten</a></section>
+<section class="hero"><p class="muted">Kapitel ${ch.c} · ${esc(ch.en)}</p><h1>${esc(ch.t)}</h1><div class="row"><a class="btn ghost" href="#seite/${(GUV_CH.find((x) => x[0] === ch.c) || [0, ch.p])[1]}">📄 Originalseiten</a>${(window.KONTROLLFRAGEN || []).some((k) => k.c === ch.c) ? `<a class="btn ghost" href="#kf/${ch.c}">🗂️ Kontrollfragen</a>` : ''}</div></section>
 <section class="card">
   <div class="card-head"><h2>Abschnitte</h2><span class="muted">${heftProgress(ch)} % gelesen</span></div>
   <ul class="tasks sec-list">${ch.s.map((s, i) => {
@@ -501,11 +502,52 @@ ${(() => { const f = readable(ch).find((s) => !S.data.heft[sectionKey(s)]) || re
     $('#askCoach').addEventListener('click', () => { coachPrefill = `Erklär mir den Abschnitt ${s.n} «${s.t}» aus Grundlagen & Verfahren ganz einfach, mit einem Beispiel.`; go('#coach'); });
   }
 
-  // ---------- Originalseiten des Hefts (Bilder, Seite für Seite) ----------
+  // ---------- Originalseiten (Heft und Flugschul-Unterlagen) ----------
   const GUV_PAGES = 566;
   const GUV_CH = [[0, 1, 'Einführung'], [1, 21, 'Vertraut werden mit dem Flugzeug'], [2, 43, 'Vorbereitung und Abschluss eines Fluges'], [3, 75, 'Angewöhnungsflug'], [4, 97, 'Wirkung der Steuer'], [5, 133, 'Rollen'], [6, 159, 'Horizontaler Geradeausflug'], [7, 173, 'Steigen'], [8, 191, 'Absinken'], [9, 211, 'Kurven'], [10, 225, 'Langsamflug und Strömungsabriss'], [11, 253, 'Abnormale Situationen'], [12, 277, 'Start und Steigflug bis zum Gegenanflug'], [13, 309, 'Platzverkehr, Anflug, Landung'], [14, 361, 'Erster Alleinflug'], [15, 373, 'Kurven mit erhöhten Anforderungen'], [16, 383, 'Notlandung ohne Triebwerkleistung'], [17, 405, 'Vorsorgliche Landung'], [18, 415, 'Navigation'], [19, 495, 'Einführung in den Instrumentenflug'], [20, 517, 'Luftraum'], [21, 535, 'Kommunikation']];
-  const sheetOf = (p) => `guv/s${String(Math.ceil(p / 2)).padStart(3, '0')}.webp`;
+  const guvPage = (p) => ({ f: `guv/s${String(Math.ceil(p / 2)).padStart(3, '0')}.webp`, y: p % 2 ? 0 : 1287, h: 1287, w: 910, H: 2574 });
   const chapterOfPage = (p) => [...GUV_CH].reverse().find((c) => p >= c[1]);
+  let pvZoom = false;
+
+  // Zeigt eine Seite bildschirmfüllend: Knöpfe oben, Tippen links/rechts, Wischen, Pfeiltasten
+  function pageViewer({ back, backLabel, title, extra, pg, i, n, hrefOf, preload, note }) {
+    view.innerHTML = `
+<div class="pv-top">
+  <a class="back" href="${back}">‹ ${esc(backLabel)}</a>
+  <span class="pv-title">${esc(title)}</span>
+</div>
+${extra || ''}
+<div class="pv-nav">
+  <a class="btn ghost pv-arrow ${i <= 1 ? 'off' : ''}" href="${i > 1 ? hrefOf(i - 1) : '#'}" aria-label="Vorherige Seite">‹</a>
+  <form id="pvGo" class="pv-go"><input id="pvNum" inputmode="numeric" value="${i}" aria-label="Seite"><span class="muted">/ ${n}</span></form>
+  <button class="btn ghost pv-arrow" id="pvZoom" aria-pressed="${pvZoom}" aria-label="Zoom">${pvZoom ? '⤡' : '🔍'}</button>
+  <a class="btn ghost pv-arrow ${i >= n ? 'off' : ''}" href="${i < n ? hrefOf(i + 1) : '#'}" aria-label="Nächste Seite">›</a>
+</div>
+<div class="pv-stage ${pvZoom ? 'zoom' : ''}" id="pvStage" style="--ar:${pg.w / pg.h}">
+  <div class="pv-page" id="pvPage" role="img" aria-label="${esc(title)}, Seite ${i}">
+    <img src="${pg.f}" alt="" style="height:${(pg.H / pg.h) * 100}%;top:${(-pg.y / pg.h) * 100}%">
+    ${pvZoom ? '' : `${i > 1 ? `<a class="pv-tap left" href="${hrefOf(i - 1)}" aria-hidden="true" tabindex="-1"></a>` : ''}${i < n ? `<a class="pv-tap right" href="${hrefOf(i + 1)}" aria-hidden="true" tabindex="-1"></a>` : ''}`}
+  </div>
+</div>
+${note ? `<p class="note pv-note">${note}</p>` : ''}`;
+    (preload || []).forEach((f) => { const im = new Image(); im.src = f; });
+    const to = (x) => go(hrefOf(Math.min(n, Math.max(1, x))));
+    view.querySelectorAll('.off').forEach((x) => x.addEventListener('click', (e) => e.preventDefault()));
+    $('#pvGo').addEventListener('submit', (e) => { e.preventDefault(); to(Number($('#pvNum').value)); });
+    $('#pvZoom').addEventListener('click', () => { pvZoom = !pvZoom; route(true); });
+    const stage = $('#pvStage');
+    let sx = null, sy = 0;
+    stage.addEventListener('touchstart', (e) => { if (e.touches.length === 1) { sx = e.touches[0].clientX; sy = e.touches[0].clientY; } }, { passive: true });
+    stage.addEventListener('touchend', (e) => {
+      if (sx == null || pvZoom) return;
+      const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+      sx = null;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) to(dx < 0 ? i + 1 : i - 1);
+    });
+    const k = (e) => { if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return; if (e.key === 'ArrowRight') to(i + 1); if (e.key === 'ArrowLeft') to(i - 1); };
+    window.addEventListener('keydown', k);
+    cleanup = () => window.removeEventListener('keydown', k);
+  }
 
   function renderSeite(n) {
     let last = 1;
@@ -513,41 +555,86 @@ ${(() => { const f = readable(ch).find((s) => !S.data.heft[sectionKey(s)]) || re
     const p = Math.min(GUV_PAGES, Math.max(1, Number(n) || last));
     try { localStorage.setItem('guvPage', p); } catch { /* egal */ }
     const ch = chapterOfPage(p);
-    view.innerHTML = `
-<a class="back" href="#heft">‹ Das Heft</a>
-<div class="pv-bar">
-  <select id="pvCh" aria-label="Kapitel">${GUV_CH.map((c) => `<option value="${c[1]}" ${c === ch ? 'selected' : ''}>${c[0]} · ${esc(c[2])}</option>`).join('')}</select>
-  <button class="btn ghost small-btn" id="pvZoom" aria-pressed="false">🔍 Zoom</button>
-</div>
-<div class="pv-scroll" id="pvScroll"><div class="pv-page" id="pvPage"><img id="pvImg" src="${sheetOf(p)}" alt="Originalseite ${p} von Grundlagen und Verfahren" class="${p % 2 ? 'top' : 'bottom'}"></div></div>
-<div class="pv-nav">
-  <button class="btn ghost" id="pvPrev" ${p <= 1 ? 'disabled' : ''}>‹</button>
-  <form id="pvGo" class="pv-go"><input id="pvNum" inputmode="numeric" value="${p}" aria-label="Seite"><span class="muted">/ ${GUV_PAGES}</span></form>
-  <button class="btn ghost" id="pvNext" ${p >= GUV_PAGES ? 'disabled' : ''}>›</button>
-</div>
-<p class="note">Originalseiten © 2026 Schweizerische Eidgenossenschaft, vertreten durch die Luftwaffe – SPHAIR Grundlagen & Verfahren 2026. Tipp: Wischen zum Blättern.</p>`;
-    // nächste Seiten vorladen
-    [p + 1, p + 2].filter((x) => x <= GUV_PAGES).forEach((x) => { const i = new Image(); i.src = sheetOf(x); });
-    const to = (x) => go(`#seite/${Math.min(GUV_PAGES, Math.max(1, x))}`);
-    $('#pvPrev').addEventListener('click', () => to(p - 1));
-    $('#pvNext').addEventListener('click', () => to(p + 1));
-    $('#pvCh').addEventListener('change', (e) => to(Number(e.target.value)));
-    $('#pvGo').addEventListener('submit', (e) => { e.preventDefault(); to(Number($('#pvNum').value)); });
-    $('#pvZoom').addEventListener('click', (e) => {
-      const on = $('#pvScroll').classList.toggle('zoom');
-      e.currentTarget.setAttribute('aria-pressed', on);
+    pageViewer({
+      back: '#heft', backLabel: 'Das Heft', title: `Grundlagen & Verfahren · Kap. ${ch[0]}`,
+      extra: `<select id="pvCh" class="pv-select" aria-label="Kapitel">${GUV_CH.map((c) => `<option value="${c[1]}" ${c === ch ? 'selected' : ''}>${c[0]} · ${esc(c[2])}</option>`).join('')}</select>`,
+      pg: guvPage(p), i: p, n: GUV_PAGES, hrefOf: (x) => `#seite/${x}`,
+      preload: [guvPage(Math.min(GUV_PAGES, p + 2)).f, guvPage(Math.max(1, p - 1)).f],
+      note: 'Originalseiten © 2026 Schweizerische Eidgenossenschaft, vertreten durch die Luftwaffe – SPHAIR Grundlagen & Verfahren 2026.',
     });
-    let sx = null, sy = 0;
-    const box = $('#pvScroll');
-    box.addEventListener('touchstart', (e) => { if (e.touches.length === 1) { sx = e.touches[0].clientX; sy = e.touches[0].clientY; } }, { passive: true });
-    box.addEventListener('touchend', (e) => {
-      if (sx == null || box.classList.contains('zoom')) return;
-      const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
-      sx = null;
-      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) to(dx < 0 ? p + 1 : p - 1);
+    $('#pvCh').addEventListener('change', (e) => go(`#seite/${e.target.value}`));
+  }
+
+  // Flugschul-Unterlagen: #doc/<flugzeug>/<dokument>/<seite>
+  function renderDoc(a, b, c) {
+    const keys = Object.keys(window.SCHULDOKS || {});
+    const key = keys[Number(a)];
+    const docs = window.SCHULDOKS?.[key];
+    const d = docs?.[Number(b)];
+    if (!d) return go('#checkliste');
+    const n = d.p.length;
+    const i = Math.min(n, Math.max(1, Number(c) || 1));
+    pageViewer({
+      back: '#checkliste', backLabel: 'Checkliste', title: `${key} · ${d.t}`,
+      extra: `<select id="pvDoc" class="pv-select" aria-label="Dokument">${docs.map((x, j) => `<option value="${j}" ${j === Number(b) ? 'selected' : ''}>${esc(x.t)}</option>`).join('')}</select>`,
+      pg: d.p[i - 1], i, n, hrefOf: (x) => `#doc/${a}/${b}/${x}`,
+      preload: [d.p[Math.min(n, i + 1) - 1].f],
+      note: 'Quelle: sphair.ch «Checklists & Procedures» (2026). Im Kurs gilt die Papier-Version deiner Flugschule.',
     });
-    view.onkeydown = null;
-    cleanup = (() => { const k = (e) => { if (e.target.tagName === 'INPUT') return; if (e.key === 'ArrowRight') to(p + 1); if (e.key === 'ArrowLeft') to(p - 1); }; window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k); })();
+    $('#pvDoc').addEventListener('change', (e) => go(`#doc/${a}/${e.target.value}/1`));
+  }
+
+  // ---------- Kontrollfragen aus dem Heft (Lernkarten) ----------
+  function renderKf(sel) {
+    const all = window.KONTROLLFRAGEN || [];
+    const chapters = [...new Set(all.map((k) => k.c))];
+    if (sel == null) {
+      const due = all.filter((k) => S.isDue('kf', k.id)).length;
+      const known = all.filter((k) => (S.data.cards[`kf:${k.id}`]?.box || 0) >= 2).length;
+      view.innerHTML = `
+<a class="back" href="#lernen">‹ Lernen</a>
+<section class="hero"><h1>Kontrollfragen</h1><p class="muted">Alle Kontrollfragen aus «Grundlagen & Verfahren» als Lernkarten. Erst selbst überlegen (am besten laut), dann aufdecken und ehrlich bewerten.</p></section>
+<section class="card">
+  <div class="card-head"><h2>Dein Stand</h2><span class="muted">${known}/${all.length} sitzen</span></div>
+  <div class="bar"><i style="width:${(known / all.length) * 100}%"></i></div>
+  <a class="btn wide" href="#kf/due">${due} fällige Karten lernen</a>
+</section>
+<ul class="chapters">${chapters.map((c) => { const ks = all.filter((k) => k.c === c); const ok = ks.filter((k) => (S.data.cards[`kf:${k.id}`]?.box || 0) >= 2).length; const t = (GUV_CH.find((x) => x[0] === c) || [c, 0, ''])[2]; return `<li><a class="card chap" href="#kf/${c}"><span class="cnum">${c}</span><span class="tt"><b>${esc(t)}</b><small>${ks.length} Fragen · ${ok} sitzen</small><span class="bar"><i style="width:${(ok / ks.length) * 100}%"></i></span></span><span class="chev">›</span></a></li>`; }).join('')}</ul>`;
+      return;
+    }
+    let deck = sel === 'due' ? T.shuffle(all.filter((k) => S.isDue('kf', k.id))).slice(0, 15) : all.filter((k) => String(k.c) === String(sel));
+    if (!deck.length) deck = T.shuffle(all).slice(0, 10);
+    let i = 0, right = 0;
+    const task = activeTask;
+    const show = (open) => {
+      const k = deck[i];
+      const t = (GUV_CH.find((x) => x[0] === k.c) || [k.c, 0, ''])[2];
+      view.innerHTML = `
+<a class="back" href="#kf">‹ Kontrollfragen</a>
+<div class="sess-head"><b>Kapitel ${k.c} · ${esc(t)}</b><span class="muted">${i + 1}/${deck.length}</span></div>
+<div class="bar thin"><i style="width:${(i / deck.length) * 100}%"></i></div>
+<section class="card q-card flash">
+  <p class="big-q">${esc(k.q)}</p>
+  ${open ? `<div class="flash-a"><p>${esc(k.a)}</p><p class="muted small">Fundstelle im Heft: ${esc(k.src)}</p></div>
+  <div class="row two-btn"><button class="btn ghost" id="kfNo">✗ Nochmal</button><button class="btn" id="kfYes">✓ Gewusst</button></div>`
+    : '<button class="btn wide" id="kfShow">Antwort zeigen</button>'}
+</section>`;
+      if (!open) { $('#kfShow').addEventListener('click', () => show(true)); $('#kfShow').focus(); return; }
+      const rate = (ok) => {
+        S.answer('kf', k.id, ok);
+        if (ok) { right++; S.addXp(2); }
+        updateTop();
+        i++;
+        if (i < deck.length) return show(false);
+        if (task === 'quiz') finishTask('quiz');
+        activeTask = null;
+        view.innerHTML = `<section class="card result"><div class="ring" style="--p:${Math.round((right / deck.length) * 100)}"><span>${right}/${deck.length}</span></div><h1>${right === deck.length ? 'Alles gewusst! 🚀' : 'Gut geübt! 💪'}</h1><p class="muted">Nicht gewusste Karten kommen morgen wieder.</p><div class="row"><a class="btn ghost" href="#kf">Fertig</a><button class="btn" id="again">Nochmal</button></div></section>`;
+        $('#again').addEventListener('click', () => route(true));
+      };
+      $('#kfNo').addEventListener('click', () => rate(false));
+      $('#kfYes').addEventListener('click', () => rate(true));
+    };
+    show(false);
   }
 
   // ---------- Checkliste lesen / abdecken ----------
@@ -561,6 +648,7 @@ ${(() => { const f = readable(ch).find((s) => !S.data.heft[sectionKey(s)]) || re
   <label>Flugschule & Flugzeug<select id="clSel">${keys.map((k) => `<option value="${esc(k)}" ${k === cl.key ? 'selected' : ''}>${esc(k)}</option>`).join('')}</select></label>
   <label class="check"><input type="checkbox" id="clHide"> Werte abdecken (antippen zum Aufdecken)</label>
 </section>
+${(() => { const keys = Object.keys(window.SCHULDOKS || {}); const ki = keys.indexOf(cl.key); const docs = window.SCHULDOKS?.[cl.key] || []; return docs.length ? `<section class="card"><div class="card-head"><h2>Original-Unterlagen</h2></div><p class="muted small">Genau so, wie du sie von der Flugschule bekommst. Die <b>Procedures</b> (Platzrunde) musst du laut SPHAIR <b>wörtlich</b> können – Prio 1!</p><div class="doc-grid">${docs.map((d, j) => `<a class="doc-btn" href="#doc/${ki}/${j}/1"><b>${esc(d.t)}</b><small>${d.p.length} ${d.p.length === 1 ? 'Seite' : 'Seiten'}</small></a>`).join('')}</div></section>` : ''; })()}
 <div id="clList">${cl.checks.map((c) => `<section class="card cl"><h2>${esc(c.name)}</h2><ol>${c.items.map(([k, v], i) => `<li><span><small class="muted">${i + 1}.</small> ${esc(k)}</span><b class="clv">${esc(v)}</b></li>`).join('')}</ol><p class="muted small">${esc(c.name)} COMPLETED</p></section>`).join('')}</div>
 <p class="note">Quelle: sphair.ch «Checklists & Procedures» (2026). Im Kurs gilt immer die Papier-Checkliste deiner Flugschule.</p>
 <a class="btn wide" href="#training/checkliste">Checkliste trainieren</a>`;
@@ -862,10 +950,11 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
   function route(force) {
     if (cleanup) { try { cleanup(); } catch { /* ignorieren */ } cleanup = null; }
     view.onkeydown = null;
-    const [page, a, b] = (location.hash.slice(1) || 'heute').split('/');
-    const tab = { heute: 'heute', lernen: 'lernen', thema: 'lernen', checkliste: 'lernen', heft: 'lernen', seite: 'lernen', lektion: 'lernen', quiz: 'lernen', training: 'training', simulation: 'training', coach: 'coach', profil: 'profil' }[page] || 'heute';
+    const [page, a, b, c] = (location.hash.slice(1) || 'heute').split('/');
+    const tab = { heute: 'heute', lernen: 'lernen', thema: 'lernen', checkliste: 'lernen', heft: 'lernen', seite: 'lernen', doc: 'lernen', kf: 'lernen', lektion: 'lernen', quiz: 'lernen', training: 'training', simulation: 'training', coach: 'coach', profil: 'profil' }[page] || 'heute';
     document.querySelectorAll('.tabs a').forEach((x) => x.classList.toggle('active', x.dataset.tab === tab));
     document.body.classList.toggle('in-chat', page === 'coach');
+    document.body.classList.toggle('in-viewer', page === 'seite' || page === 'doc');
     if (!S.settings.onboarded) return renderWelcome();
     switch (page) {
       case 'lernen': renderLernen(); break;
@@ -877,6 +966,8 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
       case 'checkliste': renderCheckliste(); break;
       case 'heft': renderHeft(a, b); break;
       case 'seite': renderSeite(a); break;
+      case 'doc': renderDoc(a, b, c); break;
+      case 'kf': renderKf(a); break;
       case 'coach': renderCoach(); break;
       case 'profil': renderProfil(); break;
       default: renderHeute();

@@ -11,7 +11,7 @@
   };
 
   const defaults = () => ({
-    settings: { name: '', screeningDate: '', school: '', theme: 'auto', apiKey: '', model: 'claude-opus-5-5', aiEnabled: true, onboarded: false },
+    settings: { name: '', screeningDate: '', school: '', theme: 'auto', design: 'standard', apiKey: '', model: 'claude-opus-5-5', aiEnabled: true, onboarded: false },
     xp: 0,
     streak: { count: 0, best: 0, last: '' },
     days: {},       // 'YYYY-MM-DD' -> { done: [taskIds], xp }

@@ -19,10 +19,25 @@
     toast.h = setTimeout(() => t.classList.remove('show'), ms);
   }
 
+  const DESIGNS = [
+    { id: 'standard', name: 'Standard', c: ['#2f5bea', '#5b7cff', '#f5f6fa'] },
+    { id: 'swiss', name: 'Swiss Rot', c: ['#d52b1e', '#f0544a', '#f7f5f5'] },
+    { id: 'cockpit', name: 'Cockpit', c: ['#ffb020', '#0f1726', '#070b14'] },
+    { id: 'sunset', name: 'Sonnenuntergang', c: ['#e8590c', '#f5a00f', '#fff8f2'] },
+    { id: 'alpen', name: 'Alpen', c: ['#13804f', '#2fb67a', '#f2f7f4'] },
+    { id: 'violett', name: 'Nachtflug', c: ['#6d4aff', '#a083ff', '#f6f4ff'] },
+  ];
+
   function applyTheme() {
     const th = S.settings.theme;
-    if (th === 'auto') document.documentElement.removeAttribute('data-theme');
-    else document.documentElement.setAttribute('data-theme', th);
+    const root = document.documentElement;
+    if (th === 'auto') root.removeAttribute('data-theme');
+    else root.setAttribute('data-theme', th);
+    const d = S.settings.design || 'standard';
+    if (d === 'standard') root.removeAttribute('data-design');
+    else root.setAttribute('data-design', d);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', getComputedStyle(root).getPropertyValue('--accent').trim() || '#2f5bea');
   }
 
   function updateTop() {
@@ -862,7 +877,8 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
   <label>Vorname<input id="pName" value="${esc(st.name)}" placeholder="z.B. Nils"></label>
   <label>Screening-Datum (falls bekannt)<input id="pDate" type="date" value="${esc(st.screeningDate)}"></label>
   <label>SPHAIR-Flugschule (für die Checkliste)<select id="pSchool"><option value="">Noch nicht bekannt (Beispiel: Bern-Belp)</option>${Object.keys(window.CHECKLISTS || {}).map((k) => `<option value="${esc(k)}">${esc(k)}</option>`).join('')}</select></label>
-  <label>Darstellung<select id="pTheme"><option value="auto">Automatisch</option><option value="light">Hell</option><option value="dark">Dunkel</option></select></label>
+  <div class="design-pick"><b class="small">Design</b><div class="design-grid">${DESIGNS.map((d) => `<button type="button" class="design-btn" data-design="${d.id}" aria-pressed="${(st.design || 'standard') === d.id}"><span class="sw">${d.c.map((c) => `<i style="background:${c}"></i>`).join('')}</span>${d.name}</button>`).join('')}</div></div>
+  <label>Hell / Dunkel<select id="pTheme"><option value="auto">Automatisch</option><option value="light">Hell</option><option value="dark">Dunkel</option></select></label>
 </section>
 
 <section class="card form">
@@ -896,6 +912,11 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
     $('#pName').addEventListener('change', (e) => { st.name = e.target.value.trim(); S.saveSettings(); toast('Gespeichert'); });
     $('#pDate').addEventListener('change', (e) => { st.screeningDate = e.target.value; S.saveSettings(); toast('Gespeichert'); });
     $('#pTheme').addEventListener('change', (e) => { st.theme = e.target.value; S.saveSettings(); applyTheme(); });
+    view.querySelectorAll('.design-btn').forEach((b) => b.addEventListener('click', () => {
+      st.design = b.dataset.design; S.saveSettings(); applyTheme();
+      view.querySelectorAll('.design-btn').forEach((x) => x.setAttribute('aria-pressed', x === b));
+      toast(`Design: ${b.textContent.trim()}`);
+    }));
     $('#pAi').addEventListener('change', (e) => { st.aiEnabled = e.target.checked; S.saveSettings(); Coach.AI.reset(); });
     $('#pKey').addEventListener('change', (e) => { st.apiKey = e.target.value.trim(); S.saveSettings(); Coach.AI.reset(); chat = []; toast(st.apiKey ? 'Schlüssel gespeichert' : 'Schlüssel entfernt'); });
     $('#pModel').addEventListener('change', (e) => { st.model = e.target.value; S.saveSettings(); Coach.AI.reset(); });

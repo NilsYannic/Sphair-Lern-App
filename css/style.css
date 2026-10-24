@@ -456,3 +456,25 @@ body.in-viewer main { padding-bottom: 0; }
 .chip-opt { position: relative; }
 .fb-err { color: #d33; font-weight: 600; margin-top: 10px; }
 .fb .two-btn { margin-top: 18px; gap: 10px; }
+
+/* Kapitel & Originalseiten überall */
+.sec-title { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 26px 2px 8px; }
+.sec-title h2 { font-size: 1.1rem; margin: 0; }
+.sec-title a { font-weight: 600; text-decoration: none; }
+.sec-sub { margin: -4px 2px 12px; }
+.cnum.done { background: var(--accent); color: var(--on-accent, #fff); }
+.orig-thumb { display: block; margin: 12px 0; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--line); background: #fff; }
+.orig-page { display: block; position: relative; aspect-ratio: 910 / 1287; overflow: hidden; }
+.orig-page img { position: absolute; left: 0; width: 100%; height: 200%; max-width: none; }
+.orig-card .orig-thumb { max-width: 260px; margin: 14px auto; }
+.orig-card .btn.wide { display: block; text-align: center; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin: 14px 0 4px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); }
+.seg button { font: 600 .9rem var(--font); padding: 9px 6px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); cursor: pointer; }
+.seg button[aria-selected="true"] { background: var(--card); color: var(--text); box-shadow: var(--shadow); }
+.lesson-orig { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--line); }
+.lesson-orig h3 { margin: 0 0 4px; font-size: 1rem; }
+.lesson-orig .orig-thumb { margin-bottom: 4px; }
+.orig-cap { display: block; font-weight: 600; font-size: .88rem; margin-bottom: 14px; text-decoration: none; }
+.lesson-orig .card { margin: 10px 0 0; }
+.pv-end { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 2px 0 8px; font-size: .95rem; }
+.pv-end a.btn.small { padding: 7px 11px; font-size: .85rem; width: auto; min-height: 0; flex: none; }

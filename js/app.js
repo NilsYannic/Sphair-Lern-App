@@ -84,8 +84,11 @@
     const trainers = T.TRAINERS;
     const tr = trainers[seed % trainers.length];
     const wt = weakestTopic();
+    const hc = seed % 2 === 0 && GUV_CH.find((c) => pagesSeen(c[0]) < chRange(c[0])[1] - chRange(c[0])[0] + 1);
     day.plan = [
-      nl
+      hc
+        ? { id: 'lesson', icon: '📄', title: 'Heft lesen (5 Seiten)', sub: `Kapitel ${hc[0]}: ${hc[2]}`, href: `#kapitel/${hc[0]}/${(() => { const [a, z] = chRange(hc[0]); const p = Array.from({ length: z - a + 1 }, (_, k) => a + k).find((x) => !S.data.heft[`p${x}`]); return p - a + 1; })()}` }
+        : nl
         ? { id: 'lesson', icon: '📖', title: 'Lektion lesen', sub: `${C.topic(nl.topic).name}: ${C.topic(nl.topic).lessons[nl.i].t}`, href: `#lektion/${nl.topic}/${nl.i}` }
         : { id: 'lesson', icon: '🔁', title: 'Wiederholen', sub: '10 fällige Karten aus allen Themen', href: '#quiz/all' },
       { id: 'train', icon: tr.icon, title: 'Screening-Training', sub: tr.name, href: `#training/${tr.id}` },
@@ -177,7 +180,7 @@ ${daysLeft != null ? `<section class="card countdown"><div><b>${daysLeft > 0 ? d
   <h3>${fact.l.t}</h3>
   <div class="fact">${fact.l.b}</div>
 </section>`;
-    view.querySelectorAll('[data-task]').forEach((a) => a.addEventListener('click', () => { activeTask = a.dataset.task; }));
+    view.querySelectorAll('[data-task]').forEach((a) => a.addEventListener('click', () => { activeTask = a.dataset.task; taskPages = 0; }));
   }
 
   // ---------- Ansicht: Lernen ----------
@@ -185,10 +188,15 @@ ${daysLeft != null ? `<section class="card countdown"><div><b>${daysLeft > 0 ? d
     activeTask = null;
     view.innerHTML = `
 <section class="hero"><h1>Lernen</h1><p class="muted">Die Theorie für Flugkurs und Airline-Weg. Lies die Lektionen, dann festigt das Quiz dein Wissen.</p></section>
-<a class="card review heft-card" href="#heft"><span class="ticon">📕</span><span class="tt"><b>Das Heft: Grundlagen & Verfahren</b><small>Das komplette offizielle SPHAIR-Lehrbuch · ${Object.keys(S.data.heft).length} Abschnitte gelesen</small></span><span class="chev">›</span></a>
+<a class="card review" href="#quiz/all"><span class="ticon">🔁</span><span class="tt"><b>Fällige Karten wiederholen</b><small>${dueAll().length} Fragen sind heute dran</small></span><span class="chev">›</span></a>
+<div class="sec-title"><h2>📕 Das Heft – Kapitel für Kapitel</h2><a class="muted small" href="#heft">Suchen ›</a></div>
+<p class="muted small sec-sub">Jedes Kapitel ist ein eigener Lernabschnitt mit den Originalseiten aus «Grundlagen und Verfahren».</p>
+<ul class="chapters">${GUV_CH.map((c) => { const pr = chapterProgress(c[0]); const r = chRange(c[0]); return `<li><a class="card chap" href="#heft/${c[0]}">
+  <span class="cnum ${pr >= 100 ? 'done' : ''}">${pr >= 100 ? '✓' : c[0]}</span><span class="tt"><b>${esc(c[2])}</b><small>${r[1] - r[0] + 1} Originalseiten${chNeed(c[0]) ? ' · <span class="need-tag">Need to know</span>' : ''}</small><span class="bar"><i style="width:${pr}%"></i></span></span><span class="chev">›</span></a></li>`; }).join('')}</ul>
+<div class="sec-title"><h2>🧰 Mehr zum Lernen</h2></div>
 <a class="card review" href="#kf"><span class="ticon">🗂️</span><span class="tt"><b>Kontrollfragen aus dem Heft</b><small>${(window.KONTROLLFRAGEN || []).length} Lernkarten mit Lösungen</small></span><span class="chev">›</span></a>
 <a class="card review" href="#checkliste"><span class="ticon">📋</span><span class="tt"><b>Checkliste deiner Flugschule</b><small>${esc(T.checklistOf().key)} – offizielle SPHAIR-Checkliste</small></span><span class="chev">›</span></a>
-<a class="card review" href="#quiz/all"><span class="ticon">🔁</span><span class="tt"><b>Fällige Karten wiederholen</b><small>${dueAll().length} Fragen sind heute dran</small></span><span class="chev">›</span></a>
+<div class="sec-title"><h2>💡 Themen-Wissen</h2></div>
 <div class="grid">
   ${C.TOPICS.map((t) => { const m = S.mastery(t.id); return `<a class="card topic" href="#thema/${t.id}" style="--c:${t.color}">
     <span class="ticon tint">${t.icon}</span><b>${t.name}</b><small class="muted">${t.desc}</small>
@@ -211,6 +219,10 @@ ${daysLeft != null ? `<section class="card countdown"><div><b>${daysLeft > 0 ? d
   <div class="card-head"><h2>Lektionen</h2><span class="muted">${t.lessons.filter((_, i) => S.data.lessons[`${t.id}:${i}`]).length}/${t.lessons.length}</span></div>
   <ul class="tasks">${t.lessons.map((l, i) => { const r = S.data.lessons[`${t.id}:${i}`]; return `<li><a class="task ${r ? 'done' : ''}" href="#lektion/${t.id}/${i}"><span class="ticon">${r ? '✓' : i + 1}</span><span class="tt"><b>${l.t}</b></span><span class="chev">›</span></a></li>`; }).join('')}</ul>
 </section>
+${(TOPIC_CH[t.id] || []).length ? `<section class="card">
+  <div class="card-head"><h2>📄 Dazu im Original-Heft</h2></div>
+  <ul class="tasks">${TOPIC_CH[t.id].map((c) => `<li><a class="task" href="#heft/${c}"><span class="snum">${c}</span><span class="tt"><b>${esc(GUV_CH[c][2])}</b><small>${chapterProgress(c)} % gelesen</small></span><span class="chev">›</span></a></li>`).join('')}</ul>
+</section>` : ''}
 <section class="card">
   <div class="card-head"><h2>Quiz</h2><span class="muted">${t.questions.length} Fragen · ${due} fällig</span></div>
   <p class="muted small">Richtig beantwortete Fragen kommen später wieder (Karteikasten). Falsche gleich morgen.</p>
@@ -230,6 +242,7 @@ ${daysLeft != null ? `<section class="card countdown"><div><b>${daysLeft > 0 ? d
   <p class="muted small">Lektion ${i + 1} von ${t.lessons.length}</p>
   <h1>${l.t}</h1>
   <div class="lesson-body">${l.b}</div>
+  <div id="lessonOrig"></div>
 </article>
 <div class="row sticky-actions">
   ${i > 0 ? `<a class="btn ghost" href="#lektion/${id}/${i - 1}">‹ Zurück</a>` : ''}
@@ -243,6 +256,8 @@ ${daysLeft != null ? `<section class="card countdown"><div><b>${daysLeft > 0 ? d
       go(i + 1 < t.lessons.length ? `#lektion/${id}/${i + 1}` : `#quiz/${id}/5`);
     });
     $('#askCoach').addEventListener('click', () => { coachPrefill = `Erklär mir «${l.t}» (${t.name}) nochmal ganz einfach, mit einem Beispiel.`; go('#coach'); });
+    const box = $('#lessonOrig');
+    loadHeft().then((H) => { if (box.isConnected) box.innerHTML = lessonOriginals(H, t, l); }).catch(() => {});
   }
 
   // ---------- Quiz ----------
@@ -474,11 +489,27 @@ ${!untimed && item.time ? '<div class="bar timer"><i id="tBar"></i></div>' : ''}
   }
 
   function renderHeftChapter(ch) {
+    const [a, z] = chRange(ch.c);
+    const n = z - a + 1;
+    const seen = pagesSeen(ch.c);
+    const next = Array.from({ length: n }, (_, k) => a + k).find((p) => !S.data.heft[`p${p}`]);
+    const resume = next ? next - a + 1 : 1;
+    const kf = (window.KONTROLLFRAGEN || []).filter((k) => k.c === ch.c).length;
+    const nextCh = GUV_CH[ch.c + 1];
     view.innerHTML = `
-<a class="back" href="#heft">‹ Das Heft</a>
-<section class="hero"><p class="muted">Kapitel ${ch.c} · ${esc(ch.en)}</p><h1>${esc(ch.t)}</h1><div class="row"><a class="btn ghost" href="#seite/${(GUV_CH.find((x) => x[0] === ch.c) || [0, ch.p])[1]}">📄 Originalseiten</a>${(window.KONTROLLFRAGEN || []).some((k) => k.c === ch.c) ? `<a class="btn ghost" href="#kf/${ch.c}">🗂️ Kontrollfragen</a>` : ''}</div></section>
+<a class="back" href="#lernen">‹ Lernen</a>
+<section class="hero"><p class="muted">Kapitel ${ch.c} · ${esc(ch.en)}</p><h1>${esc(ch.t)}</h1></section>
+<section class="card orig-card">
+  <div class="card-head"><h2>📄 Originalseiten</h2><span class="muted">${seen}/${n} Seiten</span></div>
+  <div class="bar"><i style="width:${(seen / n) * 100}%"></i></div>
+  <a class="orig-thumb" href="#kapitel/${ch.c}/${resume}" aria-label="Seite ${resume} öffnen">${origImg(a + resume - 1)}</a>
+  <a class="btn wide" href="#kapitel/${ch.c}/${resume}">${seen === 0 ? 'Kapitel starten ›' : seen >= n ? 'Nochmals blättern ›' : `Weiterlesen ab Seite ${resume} ›`}</a>
+  <p class="muted small">Seiten ${a}–${z} im Heft · blättern mit Tippen links/rechts oder Wischen.</p>
+</section>
+${kf ? `<a class="card review" href="#kf/${ch.c}"><span class="ticon">🗂️</span><span class="tt"><b>Kontrollfragen zu Kapitel ${ch.c}</b><small>${kf} Lernkarten mit Lösungen</small></span><span class="chev">›</span></a>` : ''}
 <section class="card">
-  <div class="card-head"><h2>Abschnitte</h2><span class="muted">${heftProgress(ch)} % gelesen</span></div>
+  <div class="card-head"><h2>📝 Abschnitte</h2><span class="muted">${heftProgress(ch)} % gelesen</span></div>
+  <p class="muted small">Jeder Abschnitt mit Originalseite und Text zum Nachlesen.</p>
   <ul class="tasks sec-list">${ch.s.map((s, i) => {
     const depth = s.n.split('.').length;
     if (s.h.length <= 40) return `<li class="sec-head d${depth}">${s.n} ${esc(s.t)}</li>`;
@@ -486,7 +517,31 @@ ${!untimed && item.time ? '<div class="bar timer"><i id="tBar"></i></div>' : ''}
     return `<li><a class="task ${r ? 'done' : ''} d${depth}" href="#heft/${ch.c}/${i}"><span class="snum">${r ? '✓' : s.n}</span><span class="tt"><b>${esc(s.t)}</b>${isNeed(s.n) ? '<small><span class="need-tag">Need to know</span></small>' : ''}</span><span class="chev">›</span></a></li>`;
   }).join('')}</ul>
 </section>
-${(() => { const f = readable(ch).find((s) => !S.data.heft[sectionKey(s)]) || readable(ch)[0]; return f ? `<a class="btn wide" href="#heft/${ch.c}/${ch.s.indexOf(f)}">${heftProgress(ch) ? 'Weiterlesen' : 'Kapitel starten'}</a>` : ''; })()}`;
+${nextCh ? `<a class="card review" href="#heft/${nextCh[0]}"><span class="cnum">${nextCh[0]}</span><span class="tt"><small>Nächstes Kapitel</small><b>${esc(nextCh[2])}</b></span><span class="chev">›</span></a>` : ''}`;
+  }
+
+  // Originalseiten eines Kapitels: #kapitel/<kapitel>/<seite im kapitel>
+  function renderKapitel(c, k) {
+    const ch = GUV_CH[Number(c)];
+    if (!ch) return go('#lernen');
+    const [a, z] = chRange(ch[0]);
+    const n = z - a + 1;
+    const i = Math.min(n, Math.max(1, Number(k) || 1));
+    const p = a + i - 1;
+    const first = !S.data.heft[`p${p}`];
+    if (first) { S.data.heft[`p${p}`] = true; S.save(); }
+    if (activeTask === 'lesson') { taskPages++; if (taskPages >= 5) { finishTask('lesson'); activeTask = null; } }
+    const done = pagesSeen(ch[0]) >= n;
+    if (first && done) { S.addXp(25); celebrate(`📕 Kapitel ${ch[0]} komplett gelesen! +25 ⭐`); }
+    const nextCh = GUV_CH[ch[0] + 1];
+    const kf = (window.KONTROLLFRAGEN || []).some((x) => x.c === ch[0]);
+    pageViewer({
+      back: `#heft/${ch[0]}`, backLabel: `Kapitel ${ch[0]}`, title: ch[2],
+      pg: guvPage(p), i, n, hrefOf: (x) => `#kapitel/${ch[0]}/${x}`,
+      preload: [guvPage(Math.min(z, p + 1)).f, guvPage(Math.min(z, p + 2)).f],
+      extra: i === n ? `<div class="pv-end"><b>Geschafft 🎉</b>${kf ? `<a class="btn small" href="#kf/${ch[0]}">🗂️ Kontrollfragen</a>` : ''}${nextCh ? `<a class="btn ghost small" href="#heft/${nextCh[0]}">Kap. ${nextCh[0]} ›</a>` : ''}</div>` : '',
+      note: `Seite ${p} im Heft · © 2026 Schweizerische Eidgenossenschaft, vertreten durch die Luftwaffe.`,
+    });
   }
 
   function renderHeftSection(H, ch, i) {
@@ -503,16 +558,23 @@ ${(() => { const f = readable(ch).find((s) => !S.data.heft[sectionKey(s)]) || re
   <p class="muted small">${parents.length ? esc(parents.join(' › ')) : `Kapitel ${ch.c}`}</p>
   <h1><span class="snum-h">${s.n}</span> ${esc(s.t)}</h1>
   ${isNeed(s.n) ? '<p><span class="need-tag">Need to know</span> <span class="muted small">Dieser Abschnitt wird am 1. Kurstag geprüft.</span></p>' : ''}
-  <div class="lesson-body">${s.h}</div>
-  <p class="pdf-link"><a href="#seite/${s.p}">📄 Originalseite ${s.p} ansehen (mit Bildern)</a></p>
+  <div class="seg" role="tablist"><button role="tab" data-v="orig" aria-selected="${hView() === 'orig'}">📄 Originalseite</button><button role="tab" data-v="text" aria-selected="${hView() === 'text'}">📝 Text</button></div>
+  <div class="orig-pages" ${hView() === 'orig' ? '' : 'hidden'}>${secPages(ch, i).map((pg) => `<a class="orig-thumb" href="#seite/${pg}" aria-label="Seite ${pg} gross ansehen">${origImg(pg)}</a>`).join('')}<p class="muted small">Tippe auf eine Seite, um sie gross zu sehen.</p></div>
+  <div class="lesson-body" ${hView() === 'text' ? '' : 'hidden'}>${s.h}</div>
 </article>
 <div class="row sticky-actions">
   ${prev ? `<a class="btn ghost" href="#heft/${prev.c.c}/${prev.j}">‹ Zurück</a>` : ''}
   <button class="btn" id="hNext">${next ? 'Gelesen, weiter ›' : 'Gelesen ✓'}</button>
 </div>
 <button class="link-btn" id="askCoach">💬 Frag den Coach zu diesem Abschnitt</button>`;
+    view.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => {
+      S.settings.heftView = b.dataset.v; S.save();
+      view.querySelectorAll('.seg button').forEach((x) => x.setAttribute('aria-selected', x === b));
+      $('.orig-pages').hidden = b.dataset.v !== 'orig';
+      $('.heft-sec .lesson-body').hidden = b.dataset.v !== 'text';
+    }));
     $('#hNext').addEventListener('click', () => {
-      if (!S.data.heft[sectionKey(s)]) { S.data.heft[sectionKey(s)] = true; S.addXp(3); S.save(); updateTop(); }
+      if (!S.data.heft[sectionKey(s)]) { S.data.heft[sectionKey(s)] = true; secPages(ch, i).forEach((pg) => { S.data.heft[`p${pg}`] = true; }); S.addXp(3); S.save(); updateTop(); }
       if (activeTask === 'lesson') { finishTask('lesson'); activeTask = null; }
       go(next ? `#heft/${next.c.c}/${next.j}` : '#heft');
     });
@@ -525,6 +587,60 @@ ${(() => { const f = readable(ch).find((s) => !S.data.heft[sectionKey(s)]) || re
   const guvPage = (p) => ({ f: `guv/s${String(Math.ceil(p / 2)).padStart(3, '0')}.webp`, y: p % 2 ? 0 : 1287, h: 1287, w: 910, H: 2574 });
   const chapterOfPage = (p) => [...GUV_CH].reverse().find((c) => p >= c[1]);
   let pvZoom = false;
+  let taskPages = 0;
+  // Seitenbereich eines Kapitels [erste, letzte]
+  const chRange = (c) => [GUV_CH[c][1], (GUV_CH[c + 1]?.[1] || GUV_PAGES + 1) - 1];
+  const pagesSeen = (c) => { const [a, z] = chRange(c); let n = 0; for (let p = a; p <= z; p++) if (S.data.heft[`p${p}`]) n++; return n; };
+  const chNeed = (c) => NEED.some((x) => x.split('.')[0] === String(c));
+  function chapterProgress(c) {
+    const [a, z] = chRange(c);
+    const pages = pagesSeen(c) / (z - a + 1);
+    const ch = window.HEFT?.[c];
+    const text = ch ? readable(ch).filter((s) => S.data.heft[sectionKey(s)]).length / Math.max(1, readable(ch).length) : 0;
+    return Math.round(Math.max(pages, text) * 100);
+  }
+  // Originalseite als Bild (halbe Doppelbild-Datei)
+  const origImg = (p) => { const g = guvPage(p); return `<span class="orig-page"><img src="${g.f}" alt="Originalseite ${p}" loading="lazy" style="top:${g.y ? -100 : 0}%"></span>`; };
+  const hView = () => S.settings.heftView || 'orig';
+  // Seiten, die zu einem Abschnitt gehören (bis zum nächsten Abschnitt, max. 4)
+  function secPages(ch, i) {
+    const s = ch.s[i];
+    const nx = ch.s[i + 1] || window.HEFT?.[ch.c + 1]?.s[0];
+    const last = Math.min(chRange(ch.c)[1], nx ? Math.max(s.p, nx.p - 1) : chRange(ch.c)[1], s.p + 3);
+    const out = [];
+    for (let p = s.p; p <= last; p++) out.push(p);
+    return out;
+  }
+  // Themen → passende Kapitel im Heft
+  const TOPIC_CH = { flugkurs: [1, 2, 3, 4, 5, 6, 7, 8, 9], guv2: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21], aero: [4, 10], technik: [1, 2], navi: [18], recht: [20], funk: [21], betrieb: [2, 12, 13], hf: [11, 19] };
+  const STOP = new Set(['und', 'oder', 'der', 'die', 'das', 'mit', 'beim', 'eine', 'einer', 'nach', 'über', 'ueber', 'deine', 'dein', 'was', 'wie', 'für', 'vom', 'zum', 'zur', 'den', 'des', 'ins', 'auf', 'aus']);
+  function lessonOriginals(H, t, l) {
+    const bodyTxt = plain(`${l.t} ${l.b}`);
+    const all = H.flatMap((c) => c.s.map((x, j) => ({ c, x, j })));
+    let hits = [];
+    // 1) ausdrückliche Verweise wie «(4.1.3)» oder «GuV 9.2.1»
+    for (const m of bodyTxt.matchAll(/(?:GuV\s*|\()(\d{1,2}(?:\.\d{1,2}){1,3})/g)) {
+      const h = all.find((o) => o.x.n === m[1]);
+      if (h && !hits.includes(h)) hits.push(h);
+    }
+    // 2) Kapitel-Verweise im Titel wie «(10)»
+    const chs = [...l.t.matchAll(/\((\d{1,2})\)/g)].map((m) => Number(m[1])).filter((c) => GUV_CH[c]);
+    // 3) sonst passende Abschnittstitel in den Kapiteln des Themas
+    if (!hits.length && !chs.length && TOPIC_CH[t.id]) {
+      const words = normTxt(l.t).split(/[^a-z0-9äöü]+/).filter((w) => w.length >= 5 && !STOP.has(w));
+      const scored = all.filter((o) => TOPIC_CH[t.id].includes(o.c.c) && o.x.h.length > 40)
+        .map((o) => ({ o, sc: words.filter((w) => normTxt(o.x.t).includes(w.slice(0, Math.max(5, w.length - 2)))).length }))
+        .filter((r) => r.sc > 0).sort((a, b) => b.sc - a.sc);
+      hits = scored.slice(0, 2).map((r) => r.o);
+    }
+    hits = hits.slice(0, 3);
+    if (!hits.length && !chs.length) return '';
+    return `<div class="lesson-orig">
+  <h3>📄 Im Original-Heft</h3>
+  ${hits.map((h) => `<a class="orig-thumb" href="#heft/${h.c.c}/${h.j}" aria-label="Abschnitt ${h.x.n} öffnen">${origImg(h.x.p)}</a><a class="orig-cap" href="#heft/${h.c.c}/${h.j}">${h.x.n} ${esc(h.x.t)} · Seite ${h.x.p} ›</a>`).join('')}
+  ${chs.map((c) => `<a class="card review" href="#heft/${c}"><span class="cnum">${c}</span><span class="tt"><small>Ganzes Kapitel mit Originalseiten</small><b>${esc(GUV_CH[c][2])}</b></span><span class="chev">›</span></a>`).join('')}
+</div>`;
+  }
 
   // Zeigt eine Seite bildschirmfüllend: Knöpfe oben, Tippen links/rechts, Wischen, Pfeiltasten
   function pageViewer({ back, backLabel, title, extra, pg, i, n, hrefOf, preload, note }) {
@@ -1060,10 +1176,10 @@ ${first && step === 0 ? `<section class="welcome compact"><img src="icons/icon.s
     if (cleanup) { try { cleanup(); } catch { /* ignorieren */ } cleanup = null; }
     view.onkeydown = null;
     const [page, a, b, c] = (location.hash.slice(1) || 'heute').split('/');
-    const tab = { heute: 'heute', lernen: 'lernen', thema: 'lernen', checkliste: 'lernen', heft: 'lernen', fragebogen: 'profil', seite: 'lernen', doc: 'lernen', kf: 'lernen', lektion: 'lernen', quiz: 'lernen', training: 'training', simulation: 'training', coach: 'coach', profil: 'profil' }[page] || 'heute';
+    const tab = { heute: 'heute', lernen: 'lernen', thema: 'lernen', checkliste: 'lernen', heft: 'lernen', kapitel: 'lernen', fragebogen: 'profil', seite: 'lernen', doc: 'lernen', kf: 'lernen', lektion: 'lernen', quiz: 'lernen', training: 'training', simulation: 'training', coach: 'coach', profil: 'profil' }[page] || 'heute';
     document.querySelectorAll('.tabs a').forEach((x) => x.classList.toggle('active', x.dataset.tab === tab));
     document.body.classList.toggle('in-chat', page === 'coach');
-    document.body.classList.toggle('in-viewer', page === 'seite' || page === 'doc');
+    document.body.classList.toggle('in-viewer', page === 'seite' || page === 'doc' || page === 'kapitel');
     if (!S.settings.onboarded && page !== 'fragebogen') {
       if (S.cloud === 'loading') { view.innerHTML = '<p class="muted" style="padding:60px 0;text-align:center">Lade deinen Fortschritt…</p>'; return; }
       return renderFragebogen(0);
@@ -1078,6 +1194,7 @@ ${first && step === 0 ? `<section class="welcome compact"><img src="icons/icon.s
       case 'checkliste': renderCheckliste(); break;
       case 'heft': renderHeft(a, b); break;
       case 'seite': renderSeite(a); break;
+      case 'kapitel': renderKapitel(a, b); break;
       case 'doc': renderDoc(a, b, c); break;
       case 'kf': renderKf(a); break;
       case 'coach': renderCoach(); break;

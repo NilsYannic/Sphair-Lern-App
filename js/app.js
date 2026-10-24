@@ -145,6 +145,8 @@
   <p class="muted">${new Date().toLocaleDateString('de-CH', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
   <h1>${hello}${name ? ` ${esc(name)}` : ''}! 👋</h1>
 </section>
+${S.data.profile?.done ? '' : `
+<a class="card review" href="#fragebogen/0"><span class="ticon">📝</span><span class="tt"><b>Richte dein Profil ein</b><small>2 Minuten – dann kennt dich dein Coach viel besser.</small></span><span class="chev">›</span></a>`}
 
 <section class="card streak-card">
   <div class="streak-num"><span class="flame ${day.complete ? 'lit' : ''}">🔥</span><div><b>${streak}</b><small>${streak === 1 ? 'Tag' : 'Tage'} Streak</small></div></div>
@@ -810,7 +812,8 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
     activeTask = null;
     const ai = Coach.AI.enabled;
     if (!chat.length) {
-      chat.push({ role: 'bot', text: `Hoi${S.settings.name ? ` ${S.settings.name}` : ''}! Ich bin dein SPHAIR-Coach ✈️ Frag mich alles zu Theorie, Screening oder dem Weg ins Airline-Cockpit.${ai ? '' : '\n\n(Offline-Modus – für echte KI-Gespräche trag im **Profil** einen API-Schlüssel ein.)'}` });
+      chat.push({ role: 'bot', text: `Hoi${S.settings.name ? ` ${S.settings.name}` : ''}! Ich bin dein SPHAIR-Coach ✈️ Frag mich alles zu Theorie, Screening oder dem Weg ins Airline-Cockpit.${ai ? '' : '\n\n(Gerade offline – ich antworte mit eingebauten Tipps. Im Claude-Link bin ich automatisch eine echte KI.)'}` });
+      if (!ai) Coach.AI.ready.then(() => { if (Coach.AI.enabled && location.hash.startsWith('#coach') && chat.length === 1) { chat = []; route(true); } });
     }
     view.innerHTML = `
 <section class="chat-wrap">
@@ -853,6 +856,10 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
     if (coachPrefill) { const p = coachPrefill; coachPrefill = ''; send(p); }
   }
 
+  function saveText() {
+    return { local: '💾 Wird automatisch auf diesem Gerät gespeichert', loading: '☁️ Lade gespeicherten Stand…', synced: '☁️ Automatisch gespeichert – auch auf deinen anderen Geräten', saving: '☁️ Speichert…', error: '⚠️ Online-Speichern gerade nicht möglich – lokal gesichert' }[S.cloud] || '';
+  }
+
   // ---------- Ansicht: Profil ----------
   function renderProfil() {
     activeTask = null;
@@ -862,7 +869,8 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
     const totalLessons = C.TOPICS.reduce((a, t) => a + t.lessons.length, 0);
     const runs = Object.values(d.trainers).reduce((a, t) => a + t.runs, 0);
     view.innerHTML = `
-<section class="hero"><h1>Profil</h1></section>
+<section class="hero"><h1>Profil</h1><p class="muted small" id="saveState">${saveText()}</p></section>
+<a class="card review" href="#fragebogen/0"><span class="ticon">📝</span><span class="tt"><b>Fragebogen ${d.profile?.done ? 'bearbeiten' : 'ausfüllen'}</b><small>${d.profile?.done ? `Ziel: ${esc(d.profile.goal || '–')} · ${esc(d.profile.minutes || '')} pro Tag` : 'Damit der Coach dich besser kennt (2 Min.)'}</small></span><span class="chev">›</span></a>
 <section class="stats">
   <div class="stat"><b>${S.streakNow()}</b><small>Streak</small></div>
   <div class="stat"><b>${d.streak.best}</b><small>Rekord</small></div>
@@ -938,28 +946,108 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
     });
   }
 
-  // ---------- Willkommen ----------
-  function renderWelcome() {
+  // ---------- Fragebogen (Profil einrichten) ----------
+  const SKILLS = [
+    ['kopf', 'Kopfrechnen'], ['englisch', 'Englisch'], ['raum', 'Räumliches Vorstellen'], ['technik', 'Physik & Technik'],
+    ['konz', 'Konzentration'], ['merken', 'Merkfähigkeit'], ['stress', 'Ruhe unter Stress'],
+  ];
+  const FB_STEPS = [
+    { t: 'Über dich', icon: '👋', f: [
+      { id: 'name', type: 'text', label: 'Wie heisst du?', ph: 'Vorname', req: true },
+      { id: 'age', type: 'select', label: 'Wie alt bist du?', opts: ['13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24+'] },
+      { id: 'schule', type: 'text', label: 'Welche Schule / Klasse?', ph: 'z.B. Gymnasium, 2. Klasse' },
+    ] },
+    { t: 'Dein Ziel', icon: '🎯', f: [
+      { id: 'goal', type: 'radio', label: 'Was willst du werden?', opts: ['Airline-Pilot/-in', 'Militärpilot/-in (Jet)', 'Militärpilot/-in (Helikopter)', 'Noch unsicher'] },
+      { id: 'why', type: 'textarea', label: 'Warum willst du Pilot/-in werden? (freiwillig)', ph: 'Was fasziniert dich am Fliegen?' },
+    ] },
+    { t: 'Dein Stand', icon: '🛫', f: [
+      { id: 'sphair', type: 'radio', label: 'Wie weit bist du bei SPHAIR?', opts: ['Noch nicht registriert', 'Registriert (MySPHAIR)', 'Screening gebucht', 'Screening bestanden'] },
+      { id: 'screeningDate', type: 'date', label: 'Screening-Datum (falls bekannt)' },
+      { id: 'flying', type: 'checks', label: 'Hast du schon Flugerfahrung?', opts: ['Noch nie selbst geflogen', 'Schnupperflug', 'Segelflug', 'Motorflug-Lektionen', 'Flugsimulator am PC', 'Modellflug / Drohnen'] },
+      { id: 'englishLevel', type: 'select', label: 'Dein Englisch-Niveau', opts: ['Weiss nicht', 'A2', 'B1', 'B2', 'C1', 'C2'] },
+      { id: 'glasses', type: 'radio', label: 'Trägst du eine Brille oder Linsen?', opts: ['Nein', 'Ja'] },
+    ] },
+    { t: 'Deine Stärken', icon: '💪', hint: 'Schätze dich ehrlich ein – 1 = fällt mir schwer, 5 = kann ich sehr gut. Der Coach und deine Tagesaufgaben richten sich danach.', f: SKILLS.map(([id, label]) => ({ id: `s_${id}`, type: 'scale', label })) },
+    { t: 'Wie du lernst', icon: '📚', f: [
+      { id: 'minutes', type: 'radio', label: 'Wie viel Zeit hast du pro Tag?', opts: ['5 Minuten', '10 Minuten', '20 Minuten', '30+ Minuten'] },
+      { id: 'when', type: 'radio', label: 'Wann lernst du am liebsten?', opts: ['Am Morgen', 'Nach der Schule', 'Am Abend', 'Unterschiedlich'] },
+      { id: 'style', type: 'radio', label: 'Wie soll der Coach erklären?', opts: ['Kurz und knapp', 'Ausführlich mit Beispielen'] },
+      { id: 'tone', type: 'radio', label: 'Wie soll der Coach mit dir reden?', opts: ['Locker wie ein Kollege', 'Motivierend wie ein Trainer', 'Sachlich wie ein Fluglehrer'] },
+      { id: 'hard', type: 'textarea', label: 'Was fällt dir schwer oder macht dir Sorgen? (freiwillig)', ph: 'z.B. Nervosität bei Prüfungen, Mathe, …' },
+    ] },
+    { t: 'Dein Look', icon: '🎨', design: true, f: [] },
+  ];
+
+  function renderFragebogen(stepArg) {
+    const p = (S.data.profile ||= {});
+    if (!p.name && S.settings.name) p.name = S.settings.name;
+    const step = Math.min(FB_STEPS.length - 1, Math.max(0, Number(stepArg) || 0));
+    const st = FB_STEPS[step];
+    const first = !S.settings.onboarded;
+    const val = (id) => p[id] ?? '';
+    const field = (f) => {
+      if (f.type === 'text') return `<label>${f.label}<input id="f_${f.id}" value="${esc(val(f.id))}" placeholder="${esc(f.ph || '')}" autocomplete="off"></label>`;
+      if (f.type === 'date') return `<label>${f.label}<input id="f_${f.id}" type="date" value="${esc(val(f.id))}"></label>`;
+      if (f.type === 'textarea') return `<label>${f.label}<textarea id="f_${f.id}" rows="3" placeholder="${esc(f.ph || '')}">${esc(val(f.id))}</textarea></label>`;
+      if (f.type === 'select') return `<label>${f.label}<select id="f_${f.id}">${f.opts.map((o) => `<option ${val(f.id) === o ? 'selected' : ''}>${o}</option>`).join('')}</select></label>`;
+      if (f.type === 'radio') return `<fieldset class="fb-choice"><legend>${f.label}</legend>${f.opts.map((o) => `<label class="chip-opt"><input type="radio" name="f_${f.id}" value="${esc(o)}" ${val(f.id) === o ? 'checked' : ''}><span>${o}</span></label>`).join('')}</fieldset>`;
+      if (f.type === 'checks') return `<fieldset class="fb-choice"><legend>${f.label}</legend>${f.opts.map((o) => `<label class="chip-opt"><input type="checkbox" name="f_${f.id}" value="${esc(o)}" ${(p[f.id] || []).includes(o) ? 'checked' : ''}><span>${o}</span></label>`).join('')}</fieldset>`;
+      if (f.type === 'scale') return `<fieldset class="fb-scale"><legend>${f.label}</legend><div>${[1, 2, 3, 4, 5].map((n) => `<label><input type="radio" name="f_${f.id}" value="${n}" ${Number(val(f.id)) === n ? 'checked' : ''}><span>${n}</span></label>`).join('')}</div></fieldset>`;
+      return '';
+    };
     view.innerHTML = `
-<section class="welcome">
-  <img src="icons/icon.svg" alt="" width="84" height="84">
-  <h1>Willkommen beim SPHAIR Coach</h1>
-  <p class="muted">Dein Trainingspartner auf dem Weg ins Airline-Cockpit. Jeden Tag ein paar Minuten – und du bist bereit fürs Screening.</p>
-  <ul class="feat">
-    <li><span>📖</span>Alle Theorie-Themen für Flugkurs & Airline</li>
-    <li><span>🎯</span>Trainer für jeden Screening-Test</li>
-    <li><span>🔥</span>Tagesaufgaben & Streak</li>
-    <li><span>💬</span>Persönlicher KI-Coach</li>
-  </ul>
-  <label class="name-in">Wie heisst du?<input id="wName" placeholder="Vorname"></label>
-  <button class="btn wide" id="wGo">Los geht's ✈️</button>
-</section>`;
-    $('#wGo').addEventListener('click', () => {
-      S.settings.name = $('#wName').value.trim();
+${first && step === 0 ? `<section class="welcome compact"><img src="icons/icon.svg" alt="" width="64" height="64"><h1>Willkommen beim SPHAIR Coach</h1><p class="muted">Richte zuerst dein Profil ein (ca. 2 Minuten). Damit passen Tagesaufgaben und Coach genau zu dir. Alles wird automatisch gespeichert.</p></section>` : (first ? '' : '<a class="back" href="#profil">‹ Profil</a>')}
+<div class="fb-steps" aria-label="Schritt ${step + 1} von ${FB_STEPS.length}">${FB_STEPS.map((x, i) => `<i class="${i < step ? 'done' : i === step ? 'on' : ''}"></i>`).join('')}</div>
+<form class="card form fb" id="fbForm">
+  <h2>${st.icon} ${st.t}</h2>
+  ${st.hint ? `<p class="muted small">${st.hint}</p>` : ''}
+  ${st.f.map(field).join('')}
+  ${st.design ? `<p class="muted small">Wähle ein Design – du kannst es später im Profil jederzeit ändern.</p><div class="design-grid">${DESIGNS.map((d) => `<button type="button" class="design-btn" data-design="${d.id}" aria-pressed="${(S.settings.design || 'standard') === d.id}"><span class="sw">${d.c.map((c) => `<i style="background:${c}"></i>`).join('')}</span>${d.name}</button>`).join('')}</div>` : ''}
+  <p class="fb-err" id="fbErr" hidden></p>
+  <div class="row two-btn">
+    ${step > 0 ? '<button type="button" class="btn ghost" id="fbBack">‹ Zurück</button>' : '<span></span>'}
+    <button class="btn" id="fbNext">${step < FB_STEPS.length - 1 ? 'Weiter ›' : (first ? 'Los geht\'s ✈️' : 'Fertig ✓')}</button>
+  </div>
+</form>`;
+    const collect = () => {
+      for (const f of st.f) {
+        if (f.type === 'radio' || f.type === 'scale') {
+          const c = view.querySelector(`input[name="f_${f.id}"]:checked`);
+          if (c) p[f.id] = f.type === 'scale' ? Number(c.value) : c.value;
+        } else if (f.type === 'checks') {
+          p[f.id] = [...view.querySelectorAll(`input[name="f_${f.id}"]:checked`)].map((x) => x.value);
+        } else {
+          const el = $(`#f_${f.id}`);
+          if (el) p[f.id] = el.value.trim();
+        }
+      }
+      if (p.name) S.settings.name = p.name;
+      if (p.screeningDate !== undefined) S.settings.screeningDate = p.screeningDate || S.settings.screeningDate;
+      S.save();
+    };
+    // jede Änderung sofort speichern
+    view.querySelector('#fbForm').addEventListener('change', collect);
+    view.querySelectorAll('.design-btn').forEach((b) => b.addEventListener('click', () => {
+      S.settings.design = b.dataset.design; S.saveSettings(); applyTheme();
+      view.querySelectorAll('.design-btn').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    }));
+    $('#fbBack')?.addEventListener('click', () => { collect(); go(`#fragebogen/${step - 1}`); });
+    $('#fbForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      collect();
+      const missing = st.f.find((f) => f.req && !p[f.id]);
+      if (missing) { const er = $('#fbErr'); er.hidden = false; er.textContent = 'Bitte gib noch deinen Namen ein.'; return; }
+      if (step < FB_STEPS.length - 1) return go(`#fragebogen/${step + 1}`);
+      p.done = S.dayKey();
       S.settings.onboarded = true;
-      S.saveSettings();
+      S.save();
+      Coach.AI.reset();
+      celebrate(`Profil gespeichert! Willkommen an Bord, ${esc(p.name || '')} ✈️`);
       go('#heute');
     });
+    const firstInput = view.querySelector('#fbForm input, #fbForm select');
+    if (firstInput && step === 0 && !p.name) firstInput.focus();
   }
 
   // ---------- Router ----------
@@ -972,11 +1060,14 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
     if (cleanup) { try { cleanup(); } catch { /* ignorieren */ } cleanup = null; }
     view.onkeydown = null;
     const [page, a, b, c] = (location.hash.slice(1) || 'heute').split('/');
-    const tab = { heute: 'heute', lernen: 'lernen', thema: 'lernen', checkliste: 'lernen', heft: 'lernen', seite: 'lernen', doc: 'lernen', kf: 'lernen', lektion: 'lernen', quiz: 'lernen', training: 'training', simulation: 'training', coach: 'coach', profil: 'profil' }[page] || 'heute';
+    const tab = { heute: 'heute', lernen: 'lernen', thema: 'lernen', checkliste: 'lernen', heft: 'lernen', fragebogen: 'profil', seite: 'lernen', doc: 'lernen', kf: 'lernen', lektion: 'lernen', quiz: 'lernen', training: 'training', simulation: 'training', coach: 'coach', profil: 'profil' }[page] || 'heute';
     document.querySelectorAll('.tabs a').forEach((x) => x.classList.toggle('active', x.dataset.tab === tab));
     document.body.classList.toggle('in-chat', page === 'coach');
     document.body.classList.toggle('in-viewer', page === 'seite' || page === 'doc');
-    if (!S.settings.onboarded) return renderWelcome();
+    if (!S.settings.onboarded && page !== 'fragebogen') {
+      if (S.cloud === 'loading') { view.innerHTML = '<p class="muted" style="padding:60px 0;text-align:center">Lade deinen Fortschritt…</p>'; return; }
+      return renderFragebogen(0);
+    }
     switch (page) {
       case 'lernen': renderLernen(); break;
       case 'thema': renderThema(a); break;
@@ -991,6 +1082,7 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
       case 'kf': renderKf(a); break;
       case 'coach': renderCoach(); break;
       case 'profil': renderProfil(); break;
+      case 'fragebogen': renderFragebogen(a); break;
       default: renderHeute();
     }
     if (!force) window.scrollTo(0, 0);
@@ -1001,7 +1093,13 @@ ${blocks.map((b) => `<h2 class="block-h">${names[b]}</h2><div class="grid">${T.T
   // Neuer Tag während die App offen ist → Ansicht neu laden
   document.addEventListener('visibilitychange', () => { if (!document.hidden && (location.hash || '#heute') === '#heute') route(true); });
   applyTheme();
+  // Gespeicherten Stand laden (im Claude-Link aus dem privaten Speicher) und danach neu anzeigen
+  S.onCloud(() => { const el = document.getElementById('saveState'); if (el) el.textContent = saveText(); });
+  window.addEventListener('store:loaded', () => { applyTheme(); route(true); toast('☁️ Dein Fortschritt wurde geladen'); });
+  const cloudStart = S.connectCloud();
   route();
+  cloudStart.finally(() => { if (!S.settings.onboarded) route(true); });
+  setTimeout(() => { if (!S.settings.onboarded && S.cloud === 'loading') route(true); }, 6000);
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('sw.js').catch(() => {});

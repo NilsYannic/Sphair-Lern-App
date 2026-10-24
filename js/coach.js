@@ -7,13 +7,33 @@
   const loadSdk = () => (sdkPromise ||= import('./vendor/anthropic-sdk.mjs').then((m) => m.default));
 
   // Kurzer Lernstand für den Coach
+  const SKILL_TRAINER = { kopf: 'kopf', englisch: 'englisch', raum: 'wuerfel', technik: 'technik', konz: 'vergleich', merken: 'merken', stress: 'instrumente' };
+  const SKILL_NAME = { kopf: 'Kopfrechnen', englisch: 'Englisch', raum: 'Räumliches Vorstellen', technik: 'Physik & Technik', konz: 'Konzentration', merken: 'Merkfähigkeit', stress: 'Ruhe unter Stress' };
+
+  // Antworten aus dem Fragebogen als kurzer Steckbrief
+  function profileSummary() {
+    const p = S.data.profile;
+    if (!p || !p.done) return 'Profil: Fragebogen noch nicht ausgefüllt.';
+    const skills = Object.keys(SKILL_NAME).filter((k) => p[`s_${k}`]).map((k) => `${SKILL_NAME[k]} ${p[`s_${k}`]}/5`).join(', ');
+    return [
+      `Name: ${p.name || '–'}, Alter: ${p.age || '–'}, Schule: ${p.schule || '–'}`,
+      `Ziel: ${p.goal || '–'}${p.why ? ` – Motivation: «${p.why}»` : ''}`,
+      `SPHAIR-Stand: ${p.sphair || '–'}${p.screeningDate ? `, Screening am ${p.screeningDate}` : ''}`,
+      `Flugerfahrung: ${(p.flying || []).join(', ') || '–'}; Englisch: ${p.englishLevel || '–'}; Brille: ${p.glasses || '–'}`,
+      `Selbsteinschätzung (1–5): ${skills || '–'}`,
+      `Lernzeit pro Tag: ${p.minutes || '–'}, lernt am liebsten: ${p.when || '–'}`,
+      `Wünscht Erklärungen: ${p.style || '–'}; Ton: ${p.tone || '–'}`,
+      p.hard ? `Was schwerfällt / Sorgen: «${p.hard}»` : '',
+    ].filter(Boolean).join('\n');
+  }
+
   function progressSummary() {
     const d = S.data;
     const topics = C.TOPICS.map((t) => `${t.name}: ${S.mastery(t.id)} %`).join(', ');
     const trainers = T.TRAINERS.map((t) => { const a = S.trainerAvg(t.id); return a == null ? null : `${t.name}: Ø ${a} %`; }).filter(Boolean).join(', ') || 'noch keine';
     const days = S.settings.screeningDate ? Math.ceil((new Date(S.settings.screeningDate) - new Date()) / 864e5) : null;
     return [
-      `Name: ${S.settings.name || 'unbekannt'}`,
+      profileSummary(),
       `Streak: ${S.streakNow()} Tage (Rekord ${d.streak.best}), XP: ${d.xp}`,
       `Theorie-Fortschritt: ${topics}`,
       `Screening-Trainer: ${trainers}`,
@@ -23,8 +43,16 @@
 
   function weakest() {
     const t = [...C.TOPICS].sort((a, b) => S.mastery(a.id) - S.mastery(b.id))[0];
-    const tr = T.TRAINERS.filter((x) => !x.custom).map((x) => ({ x, a: S.trainerAvg(x.id) ?? -1 })).sort((a, b) => a.a - b.a)[0];
-    return { topic: t, trainer: tr.x, trainerAvg: tr.a };
+    const list = T.TRAINERS.filter((x) => !x.custom).map((x) => ({ x, a: S.trainerAvg(x.id) ?? -1 }));
+    let tr = list.sort((a, b) => a.a - b.a)[0];
+    // Noch keine Trainingsdaten? Dann die eigene Einschätzung aus dem Fragebogen nehmen
+    const p = S.data.profile;
+    if (p?.done && list.every((x) => x.a < 0)) {
+      const weakSkill = Object.keys(SKILL_TRAINER).filter((k) => p[`s_${k}`]).sort((a, b) => p[`s_${a}`] - p[`s_${b}`])[0];
+      const x = weakSkill && T.get(SKILL_TRAINER[weakSkill]);
+      if (x) tr = { x, a: -1, skill: SKILL_NAME[weakSkill] };
+    }
+    return { topic: t, trainer: tr.x, trainerAvg: tr.a, skill: tr.skill };
   }
 
   const SYSTEM = `Du bist der persönliche SPHAIR-Coach in einer Lern-App. Du sprichst mit einer jugendlichen Person (ca. 15, Gymnasium in der Schweiz), die Airline-Pilot/-in werden will und sich auf SPHAIR vorbereitet (Screening am Fliegerärztlichen Institut Dübendorf und danach den zweiwöchigen Flugkurs).
@@ -39,19 +67,52 @@ Fakten (Quelle sphair.ch und Partner; bei Unsicherheit auf sphair.ch verweisen):
 - Airline: Zertifikat mit Empfehlung Berufspilotenlaufbahn → bei SWISS/Edelweiss entfällt seit Juni 2024 der DLR-Test; Zertifikat max. 5 Jahre alt bei Assessment Step 2; danach Ausbildung an der European Flight Academy (ca. 2 Jahre). Medical Klasse 1.
 
 So coachst du:
-- Wie ein guter Freund: locker, ermutigend, ehrlich. Duzen. Schweizer Rechtschreibung (ss statt ß).
+- Richte dich nach dem Profil aus dem Fragebogen unten (Alter, Ziel, Stand, Stärken/Schwächen, gewünschter Erklärstil und Ton). Sprich die Person mit Namen an, ohne es zu übertreiben.
+- Ton standardmässig wie ein guter Freund: locker, ermutigend, ehrlich. Duzen. Schweizer Rechtschreibung (ss statt ß).
 - Antworten KURZ: meist 2–5 Sätze oder eine kurze Liste. Nur **fett** und Aufzählungen, keine Tabellen oder Überschriften.
 - Erkläre Theorie (Aerodynamik, Meteo, Navigation, Luftrecht, Funk, Human Factors, Technik) einfach und korrekt, gern mit Beispiel. Stelle bei Bedarf eine kurze Übungsfrage zurück.
 - Gib konkrete Lerntipps passend zum Lernstand unten und verweise auf die Bereiche der App (Heute, Lernen, Training, Screening-Simulation).
 - Erfinde keine offiziellen Regeln, Termine oder Kosten. Wenn du etwas nicht sicher weisst, sag es und verweise auf sphair.ch.
 - Bei Themen rund um Gesundheit/Medical: allgemeine Infos ja, für Entscheide auf Fliegerarzt/Augenarzt verweisen.`;
 
+  const systemText = () => `${SYSTEM}\n\nProfil und Lernstand:\n${progressSummary()}\nHeute: ${new Date().toLocaleDateString('de-CH')}`;
+
+  // Im Claude-Link: Claude direkt über die «sample»-Fähigkeit fragen (ohne API-Schlüssel)
+  let sampleFn = null;
+  const sampleReady = (window.claude?.use ? window.claude.use('sample') : Promise.resolve(null))
+    .then((f) => { sampleFn = f; return f; }).catch(() => null);
+
   const AI = {
     messages: [],
     reset() { this.messages = []; },
-    get enabled() { return S.settings.aiEnabled && !!S.settings.apiKey; },
+    ready: sampleReady,
+    get viaKey() { return S.settings.aiEnabled && !!S.settings.apiKey; },
+    get enabled() { return this.viaKey || (S.settings.aiEnabled && !!sampleFn); },
 
     async ask(text, onText) {
+      if (!this.viaKey && sampleFn) return this.askSample(text, onText);
+      return this.askKey(text, onText);
+    },
+
+    async askSample(text, onText) {
+      if (this.messages.length > 30) this.messages = this.messages.slice(-20);
+      while (this.messages.length && this.messages[0].role !== 'user') this.messages.shift();
+      this.messages.push({ role: 'user', content: text });
+      const rules = `${systemText()}\n\nAntworte jetzt als Coach auf die letzte Nachricht im Gespräch.`;
+      try {
+        const res = await sampleFn([{ role: 'user', content: rules }, ...this.messages], {
+          cache: false, modelTier: 'default', onText: ({ text: t }) => onText(t),
+        });
+        const out = (res.text || '').trim();
+        this.messages.push({ role: 'assistant', content: out || '…' });
+        return out;
+      } catch (err) {
+        this.messages.pop();
+        throw err;
+      }
+    },
+
+    async askKey(text, onText) {
       const Anthropic = await loadSdk();
       const st = S.settings;
       const client = new Anthropic({ apiKey: st.apiKey, dangerouslyAllowBrowser: true });
@@ -63,7 +124,7 @@ So coachst du:
       const params = {
         model: st.model,
         max_tokens: 4096,
-        system: `${SYSTEM}\n\nAktueller Lernstand:\n${progressSummary()}\nHeute: ${new Date().toLocaleDateString('de-CH')}`,
+        system: systemText(),
         messages: this.messages,
         output_config: { effort: 'low' },
       };
@@ -89,6 +150,10 @@ So coachst du:
     },
 
     async describeError(err) {
+      if (err && typeof err.code === 'string' && !('status' in err)) {
+        const m = { not_granted: 'Du hast dem Coach nicht erlaubt, Claude zu fragen. Öffne die App neu, wenn du es doch erlauben willst.', rate_limited: 'Gerade zu viele Fragen auf einmal – warte kurz und frag nochmal.', cancelled: 'Abgebrochen.' };
+        return m[err.code] || 'Die KI ist gerade nicht erreichbar.';
+      }
       const Anthropic = await loadSdk().catch(() => null);
       if (Anthropic) {
         if (err instanceof Anthropic.AuthenticationError) return 'Der API-Schlüssel ist ungültig. Prüfe ihn im Profil.';
@@ -148,9 +213,9 @@ So coachst du:
       const body = strip(hit.l.b);
       return `Aus der Lektion **${hit.l.t}** (${hit.t.name}):\n${body.length > 420 ? `${body.slice(0, 420)}…` : body}`;
     }
-    return `Gute Frage! Ohne KI-Schlüssel kann ich nur einfache Sachen beantworten. Probier z.B. «Was soll ich heute lernen?», «Wo bin ich schwach?» oder ein Stichwort wie «Föhn» oder «Transponder».\n\nFür echte Gespräche: Trag im **Profil** einen Anthropic-API-Schlüssel ein.`;
+    return `Gute Frage! Ohne KI-Schlüssel kann ich nur einfache Sachen beantworten. Probier z.B. «Was soll ich heute lernen?», «Wo bin ich schwach?» oder ein Stichwort wie «Föhn» oder «Transponder».\n\nFür echte Gespräche: Öffne die App über den Claude-Link und erlaube dem Coach, Claude zu fragen – oder trag im **Profil** einen API-Schlüssel ein.`;
   }
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
 
-  window.Coach = { AI, offline, weakest, progressSummary };
+  window.Coach = { AI, offline, weakest, progressSummary, profileSummary };
 })();

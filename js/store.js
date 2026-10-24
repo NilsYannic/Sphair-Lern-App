@@ -1,4 +1,6 @@
-// Speicher: Fortschritt, Streak, Karteikasten und Einstellungen (localStorage)
+// Speicher: Fortschritt, Streak, Karteikasten, Profil und Einstellungen.
+// Lokal im Browser (localStorage) und – im Claude-Link – zusätzlich privat in der Artifact-Datenbank,
+// damit nichts verloren geht und der Stand auf allen Geräten gleich ist.
 (() => {
   const KEY = 'sphair-lern-v1';
   const BOX_DAYS = [0, 1, 3, 7, 16, 35]; // Wiederholungsabstand je Fach
@@ -21,19 +23,97 @@
     topics: {},     // topicId -> { right, wrong }
     trainers: {},   // trainerId -> { runs, best, last: [scores] }
     sims: [],       // Screening-Simulationen { date, score, parts }
+    profile: null,  // Antworten aus dem Fragebogen
+    updatedAt: 0,   // Zeitpunkt der letzten Änderung (für den Abgleich mit der Cloud)
   });
+
+  const normalize = (d) => {
+    const out = Object.assign(defaults(), d || {});
+    out.settings = Object.assign(defaults().settings, out.settings);
+    return out;
+  };
 
   let data;
   try {
-    data = Object.assign(defaults(), JSON.parse(localStorage.getItem(KEY) || '{}'));
-    data.settings = Object.assign(defaults().settings, data.settings);
+    data = normalize(JSON.parse(localStorage.getItem(KEY) || '{}'));
   } catch {
     data = defaults();
   }
 
-  const save = () => {
-    try { localStorage.setItem(KEY, JSON.stringify(data)); } catch { /* Speicher voll oder gesperrt */ }
+  // ---- Cloud-Speicher (nur im Claude-Link verfügbar) ----
+  let cloudDoc = null;      // Dokument data/users/<id>/state
+  let cloudTimer = null;
+  let cloudBusy = false;
+  let cloudDirty = false;
+  const listeners = [];
+  const cloud = { status: 'local' }; // local | loading | synced | saving | error
+
+  // Nur was den Lernstand ausmacht; der API-Schlüssel bleibt auf dem Gerät
+  const forCloud = () => {
+    const d = JSON.parse(JSON.stringify(data));
+    if (d.settings) delete d.settings.apiKey;
+    // alte Tageseinträge kürzen (nur die letzten 120 Tage sind nötig)
+    const keys = Object.keys(d.days || {}).sort();
+    keys.slice(0, Math.max(0, keys.length - 120)).forEach((k) => delete d.days[k]);
+    return d;
   };
+
+  const setStatus = (st) => { cloud.status = st; listeners.forEach((f) => { try { f(st); } catch { /* egal */ } }); };
+
+  async function pushCloud() {
+    if (!cloudDoc) return;
+    if (cloudBusy) { cloudDirty = true; return; }
+    cloudBusy = true;
+    cloudDirty = false;
+    setStatus('saving');
+    try {
+      await cloudDoc.set({ v: 1, state: forCloud() });
+      setStatus('synced');
+    } catch (e) {
+      setStatus('error');
+      if (e && e.code === 'unavailable') { cloudBusy = false; setTimeout(pushCloud, 1500 + Math.random() * 1500); return; }
+    }
+    cloudBusy = false;
+    if (cloudDirty) pushCloud();
+  }
+
+  const save = () => {
+    data.updatedAt = Date.now();
+    try { localStorage.setItem(KEY, JSON.stringify(data)); } catch { /* Speicher voll oder gesperrt */ }
+    if (cloudDoc) { clearTimeout(cloudTimer); cloudTimer = setTimeout(pushCloud, 1200); }
+  };
+
+  // Beim Start: Cloud-Stand laden und den neueren Stand behalten
+  async function connectCloud() {
+    if (!window.claude?.use) return;
+    setStatus('loading');
+    try {
+      const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+      const uid = db && user ? await user.id() : null;
+      if (!uid) { setStatus('local'); return; }
+      cloudDoc = db.doc(`data/users/${uid}/state`);
+      const snap = await cloudDoc.get();
+      const remote = snap.exists ? snap.data()?.state : null;
+      if (remote && (remote.updatedAt || 0) > (data.updatedAt || 0)) {
+        const apiKey = data.settings.apiKey;
+        data = normalize(remote);
+        data.settings.apiKey = apiKey;
+        try { localStorage.setItem(KEY, JSON.stringify(data)); } catch { /* egal */ }
+        setStatus('synced');
+        window.dispatchEvent(new CustomEvent('store:loaded'));
+      } else if (data.updatedAt) {
+        await pushCloud();
+      } else {
+        setStatus('synced');
+      }
+    } catch {
+      setStatus('error');
+    }
+  }
+
+  // Beim Verlassen sofort speichern
+  addEventListener('pagehide', () => { if (cloudTimer) { clearTimeout(cloudTimer); pushCloud(); } });
+  document.addEventListener('visibilitychange', () => { if (document.hidden && cloudTimer) { clearTimeout(cloudTimer); cloudTimer = null; pushCloud(); } });
 
   const S = {
     get data() { return data; },
@@ -121,17 +201,24 @@
     },
 
     saveSettings() { save(); },
+    get cloud() { return cloud.status; },
+    onCloud(f) { listeners.push(f); },
+    connectCloud,
 
     exportJson() { return JSON.stringify(data, null, 2); },
     importJson(text) {
       const d = JSON.parse(text);
       if (!d || typeof d !== 'object' || !d.settings) throw new Error('Keine gültige Sicherung');
-      data = Object.assign(defaults(), d);
+      const apiKey = data.settings.apiKey;
+      data = normalize(d);
+      data.settings.apiKey = data.settings.apiKey || apiKey;
       save();
     },
     reset() {
-      const keep = { apiKey: data.settings.apiKey, model: data.settings.model };
+      const keep = { apiKey: data.settings.apiKey, model: data.settings.model, name: data.settings.name, design: data.settings.design, theme: data.settings.theme };
+      const profile = data.profile;
       data = defaults();
+      data.profile = profile;
       Object.assign(data.settings, keep, { onboarded: true });
       save();
     },

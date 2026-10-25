@@ -35,6 +35,7 @@
     return [
       profileSummary(),
       `Streak: ${S.streakNow()} Tage (Rekord ${d.streak.best}), XP: ${d.xp}`,
+      (() => { const L = window.LERNPLAN || []; const done = d.plan?.done || {}; const cur = L.findIndex((_, j) => done[j] == null); const sc = Object.values(done); return L.length ? `Lernplan (Heft Seite für Seite, 10-Min.-Sessions): ${sc.length} von ${L.length} Sessions geschafft${sc.length ? `, Ø Quiz ${Math.round(sc.reduce((a, b) => a + b, 0) / sc.length)} %` : ''}${cur >= 0 ? `; nächste: Session ${cur + 1} «${L[cur].t}» (${L[cur].h.slice(0, 3).join('; ')})` : ''}` : ''; })(),
       `Theorie-Fortschritt: ${topics}`,
       `Screening-Trainer: ${trainers}`,
       days != null ? `Tage bis zum Screening: ${days}` : 'Screening-Datum: noch nicht festgelegt',
@@ -147,6 +148,17 @@ So coachst du:
         this.messages.pop();
         throw err;
       }
+    },
+
+    // Einmalige Anfrage ohne Gesprächsverlauf, Antwort als JSON (z.B. für Quizfragen)
+    async json(prompt) {
+      if (!this.viaKey && sampleFn?.json) return sampleFn.json(prompt, { modelTier: 'default' });
+      if (!this.viaKey) throw new Error('KI nicht verfügbar');
+      const Anthropic = await loadSdk();
+      const client = new Anthropic({ apiKey: S.settings.apiKey, dangerouslyAllowBrowser: true });
+      const msg = await client.messages.create({ model: S.settings.model, max_tokens: 4096, messages: [{ role: 'user', content: prompt }] });
+      const t = msg.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
+      return JSON.parse(t.slice(t.search(/[[{]/), Math.max(t.lastIndexOf(']'), t.lastIndexOf('}')) + 1));
     },
 
     async describeError(err) {

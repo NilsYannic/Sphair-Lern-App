@@ -78,16 +78,18 @@
 
   function todayPlan() {
     const day = S.today();
+    // ältere Tagespläne: Lese-Aufgabe durch die Lernplan-Session ersetzen
+    if (day.plan && PLAN[planCur()] && !day.done.includes('lesson') && !day.plan[0].href.startsWith('#session')) day.plan = null;
     if (day.plan) return day.plan;
     const seed = seedOf(S.dayKey());
     const nl = nextLesson();
     const trainers = T.TRAINERS;
     const tr = trainers[seed % trainers.length];
     const wt = weakestTopic();
-    const hc = seed % 2 === 0 && GUV_CH.find((c) => pagesSeen(c[0]) < chRange(c[0])[1] - chRange(c[0])[0] + 1);
+    const pc = planCur();
     day.plan = [
-      hc
-        ? { id: 'lesson', icon: '📄', title: 'Heft lesen (5 Seiten)', sub: `Kapitel ${hc[0]}: ${hc[2]}`, href: `#kapitel/${hc[0]}/${(() => { const [a, z] = chRange(hc[0]); const p = Array.from({ length: z - a + 1 }, (_, k) => a + k).find((x) => !S.data.heft[`p${x}`]); return p - a + 1; })()}` }
+      PLAN[pc]
+        ? { id: 'lesson', icon: '🎯', title: `Session ${pc + 1} (≈ ${sessMin(PLAN[pc])} Min.)`, sub: PLAN[pc].t, href: `#session/${pc + 1}` }
         : nl
         ? { id: 'lesson', icon: '📖', title: 'Lektion lesen', sub: `${C.topic(nl.topic).name}: ${C.topic(nl.topic).lessons[nl.i].t}`, href: `#lektion/${nl.topic}/${nl.i}` }
         : { id: 'lesson', icon: '🔁', title: 'Wiederholen', sub: '10 fällige Karten aus allen Themen', href: '#quiz/all' },
@@ -151,6 +153,7 @@
 ${S.data.profile?.done ? '' : `
 <a class="card review" href="#fragebogen/0"><span class="ticon">📝</span><span class="tt"><b>Richte dein Profil ein</b><small>2 Minuten – dann kennt dich dein Coach viel besser.</small></span><span class="chev">›</span></a>`}
 
+${PLAN.length ? `<a class="card review plan-next" href="#plan"><span class="ticon">🎯</span><span class="tt"><b>Lernplan: ${planDoneN()} von ${PLAN.length} Sessions</b><small>${planCur() < PLAN.length ? `1 Session pro Tag → fertig am ${finishDate(1)}` : 'Alles gelernt! 🎓'}</small><span class="bar"><i style="width:${(planDoneN() / PLAN.length) * 100}%"></i></span></span><span class="chev">›</span></a>` : ''}
 <section class="card streak-card">
   <div class="streak-num"><span class="flame ${day.complete ? 'lit' : ''}">🔥</span><div><b>${streak}</b><small>${streak === 1 ? 'Tag' : 'Tage'} Streak</small></div></div>
   <div class="week">${week.map((d) => `<div class="wd ${d.done ? 'done' : ''} ${d.today ? 'today' : ''}"><span>${d.done ? '✓' : ''}</span><small>${d.label}</small></div>`).join('')}</div>
@@ -188,6 +191,7 @@ ${daysLeft != null ? `<section class="card countdown"><div><b>${daysLeft > 0 ? d
     activeTask = null;
     view.innerHTML = `
 <section class="hero"><h1>Lernen</h1><p class="muted">Die Theorie für Flugkurs und Airline-Weg. Lies die Lektionen, dann festigt das Quiz dein Wissen.</p></section>
+<a class="card review plan-next" href="#plan"><span class="ticon">🎯</span><span class="tt"><b>Dein Lernplan</b><small>Session ${Math.min(planCur() + 1, PLAN.length)} von ${PLAN.length} · ${Math.round((planDoneN() / PLAN.length) * 100)} % geschafft</small><span class="bar"><i style="width:${(planDoneN() / PLAN.length) * 100}%"></i></span></span><span class="chev">›</span></a>
 <a class="card review" href="#quiz/all"><span class="ticon">🔁</span><span class="tt"><b>Fällige Karten wiederholen</b><small>${dueAll().length} Fragen sind heute dran</small></span><span class="chev">›</span></a>
 <div class="sec-title"><h2>📕 Das Heft – Kapitel für Kapitel</h2><a class="muted small" href="#heft">Suchen ›</a></div>
 <p class="muted small sec-sub">Jedes Kapitel ist ein eigener Lernabschnitt mit den Originalseiten aus «Grundlagen und Verfahren».</p>
@@ -717,6 +721,352 @@ ${note ? `<p class="note pv-note">${note}</p>` : ''}`;
     $('#pvDoc').addEventListener('change', (e) => go(`#doc/${a}/${e.target.value}/1`));
   }
 
+  // ---------- Lernplan: tägliche 10-Minuten-Sessions ----------
+  // Der Plan (js/lernplan.js) führt Seite für Seite durchs ganze Heft und durch alle Lektionen.
+  // Nach jeder Session prüft ein Quiz, ob alles sitzt. Falsches kommt später automatisch wieder.
+  const PLAN = window.LERNPLAN || [];
+  const PASS = 70;
+  const planState = () => (S.data.plan ||= { done: {}, tries: {} });
+  const planCur = () => { const d = planState().done; const i = PLAN.findIndex((_, j) => d[j] == null); return i < 0 ? PLAN.length : i; };
+  const planDoneN = () => Object.keys(planState().done).length;
+  const planLeftMin = () => PLAN.reduce((a, o, j) => a + (planState().done[j] == null ? o.m + 3 : 0), 0);
+  const sessMin = (o) => o.m + 3;
+  const finishDate = (perDay = 1) => {
+    const left = PLAN.length - planDoneN();
+    const d = new Date();
+    d.setDate(d.getDate() + Math.ceil(left / perDay) - 1);
+    return d.toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
+  };
+  const unitLabel = (u) => (typeof u === 'number' ? `Seite ${u}` : C.topic(u.split(':')[0])?.lessons[u.split(':')[1]]?.t || 'Lektion');
+
+  function renderPlan() {
+    activeTask = null;
+    const cur = planCur();
+    const st = planState();
+    const pct = Math.round((planDoneN() / PLAN.length) * 100);
+    const o = PLAN[cur];
+    // nach Kapiteln bzw. Themen-Blöcken gruppieren
+    const groups = [];
+    PLAN.forEach((x, j) => {
+      const g = x.c != null ? `Kapitel ${x.c} · ${GUV_CH[x.c][2]}` : `Wissen: ${x.t}`;
+      if (!groups.length || groups[groups.length - 1].g !== g) groups.push({ g, items: [] });
+      groups[groups.length - 1].items.push(j);
+    });
+    view.innerHTML = `
+<a class="back" href="#lernen">‹ Lernen</a>
+<section class="hero"><h1>Dein Lernplan</h1><p class="muted">Das ganze Heft – Seite für Seite – und alle Lektionen in ${PLAN.length} Sessions à ca. 10 Minuten. Nach jeder Session prüft ein Quiz, ob du es verstanden hast.</p></section>
+<section class="card">
+  <div class="card-head"><h2>${planDoneN()} von ${PLAN.length} Sessions</h2><span class="muted">${pct} %</span></div>
+  <div class="bar"><i style="width:${pct}%"></i></div>
+  <p class="muted small">${cur >= PLAN.length ? 'Alles gelernt – Gratulation! 🎓 Wiederhole jetzt fällige Karten.' : `Mit 1 Session pro Tag bist du am <b>${finishDate(1)}</b> fertig, mit 2 pro Tag schon am <b>${finishDate(2)}</b>. Noch ca. ${Math.round(planLeftMin() / 60)} Stunden.`}</p>
+</section>
+${o ? `<a class="card review plan-next" href="#session/${cur + 1}"><span class="ticon">🎯</span><span class="tt"><small>Als Nächstes · Session ${cur + 1}</small><b>${esc(o.t)}</b><small>≈ ${sessMin(o)} Min. · ${o.u.length} ${o.c != null ? (o.u.length === 1 ? 'Seite' : 'Seiten') : (o.u.length === 1 ? 'Lektion' : 'Lektionen')} + Quiz</small></span><span class="chev">›</span></a>` : ''}
+${groups.map((gr) => `<details class="card plan-group" ${gr.items.includes(cur) ? 'open' : ''}>
+  <summary><b>${esc(gr.g)}</b><span class="muted small">${gr.items.filter((j) => st.done[j] != null).length}/${gr.items.length}</span></summary>
+  <ul class="tasks">${gr.items.map((j) => { const x = PLAN[j]; const d = st.done[j]; const lock = j > cur; return `<li><a class="task ${d != null ? 'done' : ''} ${lock ? 'locked' : ''}" href="${lock ? '#plan' : `#session/${j + 1}`}" ${lock ? 'aria-disabled="true"' : ''}><span class="snum">${d != null ? '✓' : lock ? '🔒' : '▶'}</span><span class="tt"><b>Session ${j + 1}${x.c != null && x.t.includes('Teil') ? ` · ${esc(x.t.split('· ')[1])}` : ''}</b><small>${esc((x.h[0] || '').slice(0, 70))}${x.h.length > 1 ? ' …' : ''} · ${sessMin(x)} Min.${d != null ? ` · Quiz ${d} %` : ''}</small></span></a></li>`; }).join('')}</ul>
+</details>`).join('')}`;
+    view.querySelectorAll('.task.locked').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); toast('🔒 Erst die Sessions davor – Schritt für Schritt!'); }));
+  }
+
+  function renderSessionRoute(n, k) {
+    const idx = Number(n) - 1;
+    const o = PLAN[idx];
+    if (!o) return go('#plan');
+    if (idx > planCur()) { toast('🔒 Diese Session ist noch gesperrt'); return go(`#session/${planCur() + 1}`); }
+    if (k === 'quiz') return renderSessionQuiz(idx);
+    if (k == null || k === '') return renderSessionIntro(idx);
+    return renderSessionUnit(idx, Math.min(o.u.length, Math.max(1, Number(k) || 1)));
+  }
+
+  function renderSessionIntro(idx) {
+    const o = PLAN[idx];
+    const st = planState();
+    const pos = st.pos?.i === idx ? st.pos.k : 0;
+    const isHeft = o.c != null;
+    view.innerHTML = `
+<a class="back" href="#plan">‹ Lernplan</a>
+<section class="hero"><p class="muted">Session ${idx + 1} von ${PLAN.length} · ≈ ${sessMin(o)} Min.</p><h1>${esc(o.t)}</h1></section>
+<section class="card">
+  <h2>${isHeft ? '📄 Das liest du heute' : '📖 Das lernst du heute'}</h2>
+  <ul class="plan-list">${o.h.map((h) => `<li>${esc(h)}</li>`).join('')}</ul>
+  <p class="muted small">${isHeft ? `Originalseiten ${o.u[0]}–${o.u[o.u.length - 1]} im Heft (${o.u.length} ${o.u.length === 1 ? 'Seite' : 'Seiten'}).` : `${o.u.length} ${o.u.length === 1 ? 'Lektion' : 'Lektionen'}.`} Danach: Quiz – ab ${PASS} % ist die Session geschafft.</p>
+</section>
+${st.done[idx] != null ? `<p class="note">✓ Schon geschafft (Quiz ${st.done[idx]} %). Du kannst sie jederzeit wiederholen.</p>` : ''}
+<div class="row">
+  <a class="btn" href="#session/${idx + 1}/${pos || 1}">${pos > 1 ? `Weiter bei ${esc(unitLabel(o.u[pos - 1]))} ›` : 'Los geht\'s ›'}</a>
+  ${st.done[idx] != null || pos ? `<a class="btn ghost" href="#session/${idx + 1}/quiz">Direkt zum Quiz</a>` : ''}
+</div>
+<p class="muted small center">Tipp: Lies in Ruhe. Das Quiz fragt nach dem, was auf diesen Seiten steht.</p>`;
+    if (activeTask === 'lesson') sessTask = true;
+  }
+  let sessTask = false;
+
+  function renderSessionUnit(idx, k) {
+    const o = PLAN[idx];
+    const n = o.u.length;
+    const u = o.u[k - 1];
+    const st = planState();
+    st.pos = { i: idx, k };
+    if (activeTask === 'lesson') sessTask = true;
+    const last = k === n;
+    const head = `<div class="sess-bar"><span class="muted small">Session ${idx + 1} · ${k}/${n}</span><span class="bar thin"><i style="width:${(k / n) * 100}%"></i></span>${last ? `<a class="btn small" href="#session/${idx + 1}/quiz">Zum Quiz ›</a>` : ''}</div>`;
+    if (typeof u === 'number') {
+      if (!S.data.heft[`p${u}`]) S.data.heft[`p${u}`] = true;
+      S.save();
+      pageViewer({
+        back: `#session/${idx + 1}`, backLabel: `Session ${idx + 1}`, title: o.t,
+        extra: head, pg: guvPage(u), i: k, n, hrefOf: (x) => `#session/${idx + 1}/${x}`,
+        preload: o.u.slice(k, k + 2).filter((x) => typeof x === 'number').map((x) => guvPage(x).f),
+        note: `Seite ${u} im Heft · © 2026 Schweizerische Eidgenossenschaft, vertreten durch die Luftwaffe.`,
+      });
+      return;
+    }
+    S.save();
+    const [tid, li] = u.split(':');
+    const t = C.topic(tid);
+    const l = t.lessons[li];
+    view.innerHTML = `
+<a class="back" href="#session/${idx + 1}">‹ Session ${idx + 1}</a>
+${head}
+<article class="card lesson" style="--c:${t.color}">
+  <p class="muted small">${esc(t.name)}</p>
+  <h1>${l.t}</h1>
+  <div class="lesson-body">${l.b}</div>
+</article>
+<div class="row sticky-actions">
+  ${k > 1 ? `<a class="btn ghost" href="#session/${idx + 1}/${k - 1}">‹ Zurück</a>` : ''}
+  <a class="btn" id="sNext" href="${last ? `#session/${idx + 1}/quiz` : `#session/${idx + 1}/${k + 1}`}">${last ? 'Zum Quiz ›' : 'Weiter ›'}</a>
+</div>`;
+    $('#sNext').addEventListener('click', () => { if (!S.data.lessons[u]) { S.lessonRead(tid, Number(li)); S.addXp(5); } });
+  }
+
+  // --- Quiz zusammenstellen ---
+  function qFromKey(key) {
+    const [a, b] = key.split(':');
+    if (a === 'kf') {
+      const k = (window.KONTROLLFRAGEN || []).find((x) => String(x.id) === b);
+      return k && { kind: 'flash', q: k.q, ans: k.a, src: k.src, key };
+    }
+    const t = C.topic(a);
+    const q = t?.questions[b];
+    return q && { kind: 'mc', q: q.q, a: q.a, c: q.a[q.c], e: q.e, key, tag: t.name };
+  }
+  const cardKey = (key) => { const i = key.lastIndexOf(':'); return [key.slice(0, i), key.slice(i + 1)]; };
+  const cardSeen = (key) => !!S.data.cards[key];
+  const cardDue = (key) => { const [t, i] = cardKey(key); return S.isDue(t, i); };
+
+  // Text der Abschnitte, die auf den Seiten dieser Session stehen
+  function sessionText(H, o) {
+    if (o.c == null) return o.u.map((k) => { const [t, i] = k.split(':'); const l = C.topic(t).lessons[i]; return { n: l.t, p: null, txt: plain(l.b) }; });
+    const a = o.u[0], z = o.u[o.u.length - 1];
+    const out = [];
+    for (const ch of H) ch.s.forEach((s, i) => {
+      if (s.h.length <= 40 || /COPYRIGHT|INHALTSVERZEICHNIS/i.test(s.t)) return;
+      const nx = ch.s[i + 1];
+      const end = nx ? Math.max(s.p, nx.p - 1) : s.p + 2;
+      if (s.p <= z && end >= a) out.push({ n: s.n, t: s.t, p: Math.max(s.p, a), txt: plain(s.h).replace(/\[Grafik – siehe PDF\]/g, '') });
+    });
+    return out;
+  }
+
+  // Lückentext-Fragen aus dem Text (wenn keine KI verfügbar ist)
+  function clozeQs(secs, want) {
+    const termRe = /\b[A-ZÄÖÜ][A-ZÄÖÜ-]{3,}(?:\s+[A-ZÄÖÜ][A-ZÄÖÜ-]{1,}){0,3}\b/g;
+    const pool = new Set();
+    secs.forEach((s) => (s.txt.match(termRe) || []).forEach((m) => { if (m.length <= 40) pool.add(m.trim()); }));
+    const norm = (x) => x.toLowerCase().replace(/[^a-zäöü]/g, '');
+    const seen = new Set();
+    const terms = [...pool].filter((x) => { const k = norm(x); if (seen.has(k)) return false; seen.add(k); return true; });
+    const cands = [];
+    secs.forEach((s) => s.txt.split(/(?<=[.!?])\s+/).forEach((sen) => {
+      if (sen.length < 50 || sen.length > 240) return;
+      const ms = (sen.match(termRe) || []).filter((m) => m.length <= 40);
+      if (ms.length !== 1) return;
+      const term = ms[0].trim();
+      if (sen.replace(term, '').trim().length < 30) return;
+      const wrong = T.shuffle(terms.filter((x) => norm(x) !== norm(term) && !norm(term).includes(norm(x)) && !norm(x).includes(norm(term)) && !sen.includes(x))).slice(0, 3);
+      if (wrong.length < 3) return;
+      cands.push({ kind: 'mc', q: `Welcher Begriff gehört in die Lücke?<br><span class="cloze">«${esc(sen.replace(term, '_____'))}»</span>`, html: true, a: [term, ...wrong], c: term, e: `Abschnitt ${s.n}`, src: s.n, p: s.p, key: 'gen', tag: 'Lückentext' });
+    }));
+    return T.shuffle(cands).slice(0, want);
+  }
+
+  async function aiQs(idx, secs, want) {
+    const cacheKey = 'sphair-genq';
+    let cache = {};
+    try { cache = JSON.parse(localStorage.getItem(cacheKey) || '{}'); } catch { /* egal */ }
+    if (cache[idx]?.length >= want) return cache[idx];
+    if (!Coach.AI.enabled) return null;
+    const age = S.data.profile?.age;
+    let text = '';
+    for (const s of secs) { if (text.length > 14000) break; text += `\n\n[${s.n}${s.t ? ` ${s.t}` : ''}]\n${s.txt.slice(0, 5000)}`; }
+    const prompt = `Du erstellst ein Verständnis-Quiz für eine Lern-App zur SPHAIR-Vorbereitung (Schweizer Luftwaffe, Pilotenausbildung).${age ? ` Der Lernende ist ${age} Jahre alt.` : ''}
+Unten steht der Text, den er gerade gelesen hat (aus «Grundlagen und Verfahren» bzw. Lektionen). Erstelle genau ${want} Multiple-Choice-Fragen auf Deutsch (Schweizer Schreibweise, kein ß), die prüfen, ob er das Wichtigste VERSTANDEN hat – Abläufe, Gründe, Zusammenhänge, Werte. Keine Fragen zu Copyright, Seitenzahlen, Arbeitsblättern oder Formalien. Nur was eindeutig aus dem Text folgt. Jede Frage mit genau 4 kurzen Antworten, nur eine richtig, plausible falsche Antworten.
+Antworte nur mit einem JSON-Array, Beispiel: [{"q":"Frage?","a":["richtig","falsch","falsch","falsch"],"c":0,"e":"kurze Erklärung (1 Satz)","s":"4.1.2"}] – "c" ist der Index der richtigen Antwort, "s" die Abschnittsnummer aus den eckigen Klammern.
+
+TEXT:${text}`;
+    try {
+      const arr = await Coach.AI.json(prompt);
+      const qs = (Array.isArray(arr) ? arr : []).filter((x) => x && typeof x.q === 'string' && Array.isArray(x.a) && x.a.length >= 3 && Number.isInteger(x.c) && x.a[x.c] != null)
+        .slice(0, want).map((x) => {
+          const sec = secs.find((s) => s.n === String(x.s)) || secs[0];
+          return { kind: 'mc', q: x.q, a: x.a.map(String), c: String(x.a[x.c]), e: x.e ? String(x.e) : '', src: sec?.p ? sec.n : null, p: sec?.p || null, key: 'gen', tag: '✨ KI-Frage' };
+        });
+      if (qs.length) {
+        cache[idx] = qs;
+        const keys = Object.keys(cache);
+        keys.slice(0, Math.max(0, keys.length - 8)).forEach((k2) => delete cache[k2]);
+        try { localStorage.setItem(cacheKey, JSON.stringify(cache)); } catch { /* egal */ }
+      }
+      return qs;
+    } catch { return null; }
+  }
+
+  async function buildQuiz(idx) {
+    const o = PLAN[idx];
+    const own = T.shuffle(o.q.map(qFromKey).filter(Boolean));
+    const mc = own.filter((x) => x.kind === 'mc');
+    const fl = own.filter((x) => x.kind === 'flash');
+    // zuerst Fragen, die noch nie oder falsch beantwortet wurden
+    const pri = (x) => (!cardSeen(x.key) ? 0 : cardDue(x.key) ? 1 : 2);
+    mc.sort((a, b) => pri(a) - pri(b));
+    fl.sort((a, b) => pri(a) - pri(b));
+    const picked = [...mc.slice(0, 4), ...fl.slice(0, 2)];
+    // Wiederholung: Fälliges aus früheren Sessions
+    const today = S.dayKey();
+    const rev = (S.data.review || []).filter((r) => r.due <= today).slice(0, 2).map((r) => ({ ...r, kind: 'mc', key: 'rev', tag: '🔁 Wiederholung' }));
+    if (rev.length < 2) {
+      const old = PLAN.slice(0, idx).flatMap((x) => x.q).filter((k) => cardSeen(k) && cardDue(k));
+      T.shuffle(old).slice(0, 2 - rev.length).forEach((k) => { const q = qFromKey(k); if (q) rev.push({ ...q, tag: '🔁 Wiederholung' }); });
+    }
+    let gen = [];
+    const want = Math.max(o.c != null ? 3 : 1, 6 - picked.length);
+    const H = await loadHeft().catch(() => null);
+    const secs = H ? sessionText(H, o) : [];
+    if (secs.length) {
+      gen = (await aiQs(idx, secs, want)) || [];
+      if (gen.length < want) gen = gen.concat(clozeQs(secs, want - gen.length));
+    }
+    // zu wenige Fragen? Mit Fragen aus früheren Sessions auffüllen
+    const all = [...picked, ...gen, ...rev];
+    if (all.length < 4) {
+      const have = new Set(all.map((x) => x.key));
+      T.shuffle(PLAN.slice(Math.max(0, idx - 12), idx).flatMap((x) => x.q).filter((k) => !have.has(k))).slice(0, 4 - all.length)
+        .forEach((k) => { const q = qFromKey(k); if (q) rev.push({ ...q, tag: '🔁 Wiederholung' }); });
+    }
+    return T.shuffle([...picked, ...gen]).concat(rev).slice(0, 9);
+  }
+
+  async function renderSessionQuiz(idx) {
+    const o = PLAN[idx];
+    view.innerHTML = `<section class="card center" style="padding:40px 20px"><div class="spinner"></div><p class="muted">Dein Quiz wird vorbereitet…${Coach.AI.enabled ? '<br><small>Die KI schreibt Fragen genau zu deinen Seiten.</small>' : ''}</p></section>`;
+    const token = (renderSessionQuiz.t = (renderSessionQuiz.t || 0) + 1);
+    const items = await buildQuiz(idx);
+    if (token !== renderSessionQuiz.t || !location.hash.startsWith(`#session/${idx + 1}/quiz`)) return;
+    if (!items.length) return sessionResult(idx, 100, []);
+    let k = 0, right = 0;
+    const wrongs = [];
+    const show = (open) => {
+      const it = items[k];
+      view.innerHTML = `
+<a class="back" href="#session/${idx + 1}">‹ Session ${idx + 1}</a>
+<div class="sess-head"><b>Quiz · Session ${idx + 1}</b><span class="muted">${k + 1}/${items.length}</span></div>
+<div class="bar thin"><i style="width:${(k / items.length) * 100}%"></i></div>
+<section class="card q-card ${it.kind === 'flash' ? 'flash' : ''}">
+  ${it.tag ? `<p class="tag">${esc(it.tag)}</p>` : it.kind === 'flash' ? '<p class="tag">Kontrollfrage aus dem Heft</p>' : ''}
+  <p class="big-q">${it.html ? it.q : esc(it.q)}</p>
+  ${it.kind === 'mc' ? `<div class="opts">${(it.opts ||= T.shuffle(it.a)).map((x, i) => `<button class="opt" data-i="${i}"><kbd>${i + 1}</kbd><span>${esc(x)}</span></button>`).join('')}</div><div id="fb"></div>`
+    : open ? `<div class="flash-a"><p>${esc(it.ans)}</p>${it.src ? `<p class="muted small">Fundstelle im Heft: ${esc(it.src)}</p>` : ''}</div><p class="muted small">Ehrlich sein: Hast du es gewusst?</p><div class="row two-btn"><button class="btn ghost" id="kfNo">✗ Nicht gewusst</button><button class="btn" id="kfYes">✓ Gewusst</button></div>`
+      : '<p class="muted small">Überleg dir zuerst deine Antwort – dann aufdecken.</p><button class="btn wide" id="kfShow">Antwort zeigen</button>'}
+</section>`;
+      const nextQ = () => { k++; if (k < items.length) show(false); else sessionResult(idx, Math.round((right / items.length) * 100), wrongs); };
+      const record = (ok) => {
+        if (ok) right++; else wrongs.push(it);
+        if (it.key === 'rev') reviewAnswer(it, ok);
+        else if (it.key === 'gen') { if (!ok) reviewAdd(it); }
+        else { const [t, i] = cardKey(it.key); S.answer(t, i, ok); }
+        if (ok) S.addXp(2);
+        updateTop();
+      };
+      if (it.kind === 'flash') {
+        if (!open) { $('#kfShow').addEventListener('click', () => show(true)); return; }
+        $('#kfNo').addEventListener('click', () => { record(false); nextQ(); });
+        $('#kfYes').addEventListener('click', () => { record(true); nextQ(); });
+        return;
+      }
+      let done = false;
+      view.querySelectorAll('.opt').forEach((b) => b.addEventListener('click', () => {
+        if (done) return;
+        done = true;
+        const val = it.opts[b.dataset.i];
+        const ok = val === it.c;
+        record(ok);
+        view.querySelectorAll('.opt').forEach((x) => { const v = it.opts[x.dataset.i]; if (v === it.c) x.classList.add('right'); else if (x === b) x.classList.add('wrong'); x.disabled = true; });
+        const pageLink = it.p ? ` <a href="#seite/${it.p}">📄 Seite ${it.p}</a>` : '';
+        $('#fb').innerHTML = `${ok ? '<p class="fb good">✓ Richtig!</p>' : `<p class="fb bad">✗ Richtig ist: <b>${esc(it.c)}</b></p>`}${it.e ? `<p class="muted small">${esc(it.e)}${ok ? '' : pageLink}</p>` : ''}<button class="btn" id="nextBtn">${k + 1 < items.length ? 'Weiter' : 'Auswertung'}</button>`;
+        $('#nextBtn').addEventListener('click', nextQ);
+        $('#nextBtn').focus();
+      }));
+      view.onkeydown = (e) => { if (/^[1-4]$/.test(e.key)) view.querySelector(`.opt[data-i="${Number(e.key) - 1}"]`)?.click(); };
+    };
+    show(false);
+  }
+
+  // Falsch beantwortete KI-/Lückentext-Fragen kommen später wieder
+  function reviewAdd(it) {
+    const r = (S.data.review ||= []);
+    if (r.some((x) => x.q === it.q)) return;
+    r.push({ q: it.q, a: it.a, c: it.c, e: it.e, p: it.p, html: !!it.html, box: 1, due: S.addDays(S.dayKey(), 1) });
+    if (r.length > 60) r.splice(0, r.length - 60);
+    S.save();
+  }
+  function reviewAnswer(it, ok) {
+    const r = S.data.review || [];
+    const x = r.find((y) => y.q === it.q);
+    if (!x) return;
+    if (ok) { x.box++; x.due = S.addDays(S.dayKey(), [0, 3, 7, 16][Math.min(x.box, 3)]); if (x.box >= 4) r.splice(r.indexOf(x), 1); }
+    else { x.box = 1; x.due = S.addDays(S.dayKey(), 1); }
+    S.save();
+  }
+
+  function sessionResult(idx, score, wrongs) {
+    const o = PLAN[idx];
+    const st = planState();
+    const pass = score >= PASS;
+    const first = st.done[idx] == null;
+    st.tries[idx] = (st.tries[idx] || 0) + (pass ? 0 : 1);
+    if (pass) {
+      st.done[idx] = Math.max(score, st.done[idx] || 0);
+      st.pos = null;
+      delete st.tries[idx];
+      if (first) S.addXp(20);
+    }
+    S.save();
+    if (pass && first && (sessTask || activeTask === 'lesson' || todayPlan().find((p) => p.id === 'lesson')?.href.startsWith('#session'))) finishTask('lesson');
+    sessTask = false;
+    activeTask = null;
+    const nx = PLAN[planCur()];
+    const tries = st.tries[idx] || 0;
+    const weak = [...new Map(wrongs.filter((w) => w.p).map((w) => [w.p, w])).values()];
+    view.innerHTML = `
+<section class="card result">
+  <div class="ring" style="--p:${score}"><span>${score}%</span></div>
+  <h1>${pass ? (score >= 90 ? 'Perfekt verstanden! 🚀' : 'Session geschafft! ✈️') : 'Fast! Noch nicht ganz sicher 💪'}</h1>
+  <p class="muted">${pass ? `${first ? '+20 ⭐ · ' : ''}Session ${idx + 1} von ${PLAN.length} erledigt.` : `Ab ${PASS} % ist die Session geschafft. Schau dir die Stellen nochmal an und versuch es erneut.`}</p>
+  ${wrongs.length ? `<details class="wrongs" ${pass ? '' : 'open'}><summary>Das solltest du nochmal anschauen (${wrongs.length})</summary>${wrongs.map((w) => `<div class="wr"><b>${w.html ? w.q.replace(/<br>.*$/, '') : esc(w.q)}</b><p>✓ ${esc(w.kind === 'flash' ? w.ans : w.c)}</p>${w.p ? `<p class="small"><a href="#seite/${w.p}">📄 Seite ${w.p} ansehen</a></p>` : ''}</div>`).join('')}<p class="muted small">Falsches kommt in den nächsten Sessions als Wiederholung wieder.</p></details>` : ''}
+  <div class="row">
+    ${pass ? (nx ? `<a class="btn ghost" href="#heute">Fertig für heute</a><a class="btn" href="#session/${planCur() + 1}">Nächste Session ›</a>` : '<a class="btn" href="#plan">Zum Lernplan</a>')
+    : `<a class="btn ghost" href="#session/${idx + 1}/${weak[0] ? Math.max(1, o.u.indexOf(weak[0].p) + 1) : 1}">📄 Nochmal lesen</a><button class="btn" id="again">Quiz nochmal</button>`}
+  </div>
+  ${!pass && tries >= 2 ? '<button class="link-btn" id="skip">Trotzdem weiter (kommt später als Wiederholung)</button>' : ''}
+  ${pass && nx ? `<p class="muted small">Als Nächstes: ${esc(nx.t)} · ≈ ${sessMin(nx)} Min.</p>` : ''}
+</section>`;
+    if (pass && first) celebrate(`🎯 Session ${idx + 1} geschafft!`);
+    $('#again')?.addEventListener('click', () => route(true));
+    $('#skip')?.addEventListener('click', () => { st.done[idx] = score; delete st.tries[idx]; st.pos = null; S.save(); wrongs.forEach((w) => w.key === 'gen' && reviewAdd(w)); go(`#session/${planCur() + 1}`); });
+  }
+
+
   // ---------- Kontrollfragen aus dem Heft (Lernkarten) ----------
   function renderKf(sel) {
     const all = window.KONTROLLFRAGEN || [];
@@ -1176,10 +1526,10 @@ ${first && step === 0 ? `<section class="welcome compact"><img src="icons/icon.s
     if (cleanup) { try { cleanup(); } catch { /* ignorieren */ } cleanup = null; }
     view.onkeydown = null;
     const [page, a, b, c] = (location.hash.slice(1) || 'heute').split('/');
-    const tab = { heute: 'heute', lernen: 'lernen', thema: 'lernen', checkliste: 'lernen', heft: 'lernen', kapitel: 'lernen', fragebogen: 'profil', seite: 'lernen', doc: 'lernen', kf: 'lernen', lektion: 'lernen', quiz: 'lernen', training: 'training', simulation: 'training', coach: 'coach', profil: 'profil' }[page] || 'heute';
+    const tab = { heute: 'heute', lernen: 'lernen', thema: 'lernen', checkliste: 'lernen', heft: 'lernen', kapitel: 'lernen', plan: 'lernen', session: 'lernen', fragebogen: 'profil', seite: 'lernen', doc: 'lernen', kf: 'lernen', lektion: 'lernen', quiz: 'lernen', training: 'training', simulation: 'training', coach: 'coach', profil: 'profil' }[page] || 'heute';
     document.querySelectorAll('.tabs a').forEach((x) => x.classList.toggle('active', x.dataset.tab === tab));
     document.body.classList.toggle('in-chat', page === 'coach');
-    document.body.classList.toggle('in-viewer', page === 'seite' || page === 'doc' || page === 'kapitel');
+    document.body.classList.toggle('in-viewer', page === 'seite' || page === 'doc' || page === 'kapitel' || (page === 'session' && /^\d+$/.test(b || '') && typeof PLAN[a - 1]?.u[b - 1] === 'number'));
     if (!S.settings.onboarded && page !== 'fragebogen') {
       if (S.cloud === 'loading') { view.innerHTML = '<p class="muted" style="padding:60px 0;text-align:center">Lade deinen Fortschritt…</p>'; return; }
       return renderFragebogen(0);
@@ -1195,6 +1545,8 @@ ${first && step === 0 ? `<section class="welcome compact"><img src="icons/icon.s
       case 'heft': renderHeft(a, b); break;
       case 'seite': renderSeite(a); break;
       case 'kapitel': renderKapitel(a, b); break;
+      case 'plan': renderPlan(); break;
+      case 'session': renderSessionRoute(a, b); break;
       case 'doc': renderDoc(a, b, c); break;
       case 'kf': renderKf(a); break;
       case 'coach': renderCoach(); break;

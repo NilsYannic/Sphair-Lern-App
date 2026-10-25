@@ -478,3 +478,24 @@ body.in-viewer main { padding-bottom: 0; }
 .lesson-orig .card { margin: 10px 0 0; }
 .pv-end { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 2px 0 8px; font-size: .95rem; }
 .pv-end a.btn.small { padding: 7px 11px; font-size: .85rem; width: auto; min-height: 0; flex: none; }
+
+/* Lernplan & Sessions */
+.plan-next .bar { display: block; margin: 8px 0 0; height: 5px; }
+.plan-next .tt small:first-child { color: var(--accent); font-weight: 700; }
+.plan-group { padding: 0; }
+.plan-group summary { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; list-style: none; }
+.plan-group summary::-webkit-details-marker { display: none; }
+.plan-group summary::after { content: '›'; color: var(--muted); transition: .2s; }
+.plan-group[open] summary::after { transform: rotate(90deg); }
+.plan-group summary b { flex: 1; min-width: 0; }
+.plan-group .tasks { padding: 0 10px 10px; margin: 0; }
+.task.locked { opacity: .5; }
+.plan-list { padding-left: 20px; margin: 8px 0; }
+.plan-list li { margin: 5px 0; font-weight: 600; }
+.center { text-align: center; }
+.sess-bar { display: flex; align-items: center; gap: 10px; margin: 2px 0 8px; }
+.sess-bar .bar { flex: 1; margin: 0; }
+.sess-bar a.btn.small { padding: 7px 12px; font-size: .85rem; width: auto; flex: none; }
+.cloze { display: block; margin-top: 10px; font-weight: 500; font-size: .98rem; line-height: 1.5; }
+.spinner { width: 34px; height: 34px; margin: 0 auto 14px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--accent); animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }

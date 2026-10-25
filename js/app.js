@@ -157,7 +157,7 @@ ${PLAN.length ? `<a class="card review plan-next" href="#plan"><span class="tico
 <section class="card streak-card">
   <div class="streak-num"><span class="flame ${day.complete ? 'lit' : ''}">🔥</span><div><b>${streak}</b><small>${streak === 1 ? 'Tag' : 'Tage'} Streak</small></div></div>
   <div class="week">${week.map((d) => `<div class="wd ${d.done ? 'done' : ''} ${d.today ? 'today' : ''}"><span>${d.done ? '✓' : ''}</span><small>${d.label}</small></div>`).join('')}</div>
-  <p class="muted small">${day.complete ? 'Heute erledigt – stark! Morgen geht\'s weiter.' : 'Erledige alle 3 Tagesaufgaben, damit deine Streak wächst.'} Rekord: ${S.data.streak.best}</p>
+  <p class="muted small">${day.complete ? 'Heute erledigt – stark! Morgen geht\'s weiter.' : 'Schaffe eine Session aus deinem Lernplan (oder alle 3 Tagesaufgaben), damit deine Streak wächst.'} Rekord: ${S.data.streak.best}</p>
 </section>
 
 <section class="card">
@@ -1045,6 +1045,9 @@ TEXT:${text}`;
     if (pass && first && (sessTask || activeTask === 'lesson' || todayPlan().find((p) => p.id === 'lesson')?.href.startsWith('#session'))) finishTask('lesson');
     sessTask = false;
     activeTask = null;
+    // Eine geschaffte Session reicht, damit die Streak wächst
+    let streakUp = false;
+    if (pass) { const day = S.today(); if (!day.complete) { day.complete = true; streakUp = S.completeDay(); S.save(); updateTop(); } }
     const nx = PLAN[planCur()];
     const tries = st.tries[idx] || 0;
     const weak = [...new Map(wrongs.filter((w) => w.p).map((w) => [w.p, w])).values()];
@@ -1061,7 +1064,8 @@ TEXT:${text}`;
   ${!pass && tries >= 2 ? '<button class="link-btn" id="skip">Trotzdem weiter (kommt später als Wiederholung)</button>' : ''}
   ${pass && nx ? `<p class="muted small">Als Nächstes: ${esc(nx.t)} · ≈ ${sessMin(nx)} Min.</p>` : ''}
 </section>`;
-    if (pass && first) celebrate(`🎯 Session ${idx + 1} geschafft!`);
+    if (streakUp) celebrate(`🔥 Session geschafft – Streak: <b>${S.streakNow()}</b> ${S.streakNow() === 1 ? 'Tag' : 'Tage'}!`);
+    else if (pass && first) celebrate(`🎯 Session ${idx + 1} geschafft!`);
     $('#again')?.addEventListener('click', () => route(true));
     $('#skip')?.addEventListener('click', () => { st.done[idx] = score; delete st.tries[idx]; st.pos = null; S.save(); wrongs.forEach((w) => w.key === 'gen' && reviewAdd(w)); go(`#session/${planCur() + 1}`); });
   }
